@@ -6,107 +6,103 @@ import com.automation.DataHandler.Course;
 import com.automation.DataHandler.Semester;
 
 import java.awt.*;
+import java.io.File;
 import java.util.List;
 
 public class TranscriptApp extends JFrame {
-    private JTextArea textArea; // Add this line
-    JScrollPane scrollPane = new JScrollPane(textArea); // Add scrolling capability
-    JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView());
-    ImageIcon logoIcon = new ImageIcon("logo.png");
-    JLabel logoLabel = new JLabel(logoIcon);
+
+    private JTextArea textArea;
+    private JFileChooser fileChooser;
 
     public TranscriptApp() {
-        // Frame settings
+        initializeComponents();
+        layoutComponents();
+        addListeners();
+    }
+
+    private void initializeComponents() {
         setTitle("Exam Eligibility Checker");
-        setSize(500, 400); // Adjusted for better visibility
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Use a different layout that allows more flexibility
+
+        textArea = new JTextArea(15, 30);
+        textArea.setEditable(false);
+
+        fileChooser = new JFileChooser(FileSystemView.getFileSystemView());
+
+    }
+
+    private void layoutComponents() {
+        // Layout Manager
         setLayout(new BorderLayout());
+        // Inside your TranscriptApp constructor or initialization method
+        try {
+            // Replace "/path/to/logo.png" with the actual path to your logo image
+            ImageIcon imgIcon = new ImageIcon(getClass().getResource("logo.png"));
+            Image img = imgIcon.getImage();
+            this.setIconImage(img);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Handle the error gracefully, maybe log it or show a default icon
+        }
+        // Text area in the center with scroll
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        add(scrollPane, BorderLayout.CENTER);
 
-        // Initialize the JTextArea
-        textArea = new JTextArea(15, 30); // Adjust size as needed
-        textArea.setEditable(false); // Make the text area read-only
-        // You can create scrollPane here with the initialized textArea
-        scrollPane = new JScrollPane(textArea); // Add scrolling capability
-
-        logoIcon = new ImageIcon(getClass().getResource("logo.png"));
-        logoLabel = new JLabel(logoIcon);
-        logoLabel.setSize(10, 10);
-
-        // Add components to the pane
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        topPanel.add(logoLabel);
-        add(topPanel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel();
-        centerPanel.add(scrollPane); // Add the JScrollPane, which contains the JTextArea
-        add(centerPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Buttons at the bottom
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton uploadButton = new JButton("Upload Transcript");
         JButton checkButton = new JButton("Check Eligibility");
-        // Upload button and Check Eligibility button go here...
-        bottomPanel.add(uploadButton);
-        bottomPanel.add(checkButton);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        // Upload button
-
+        buttonPanel.add(uploadButton);
+        buttonPanel.add(checkButton);
+        add(buttonPanel, BorderLayout.SOUTH);
         uploadButton.addActionListener(e -> {
-            int r = j.showOpenDialog(null);
-            if (r == JFileChooser.APPROVE_OPTION) {
-                String filePath = j.getSelectedFile().getAbsolutePath();
-                String transcript = PdfParser.extractTextFromPDF(filePath);
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                System.out.println(selectedFile.getAbsolutePath());
+            }
+        });
 
+        checkButton.addActionListener(e -> {
+            String transcript = textArea.getText();
+            List<Semester> semesters = DataHandler.parseTranscript(transcript);
+            EligibityChecker checker = new EligibityChecker();
+            boolean isEligible = true;
+            if (isEligible) {
+                JOptionPane.showMessageDialog(null, "Eligible for the exam");
+            } else {
+                JOptionPane.showMessageDialog(null, "Not eligible for the exam");
+            }
+        });
+    }
+
+    private void addListeners() {
+
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PDF files", "pdf"));
+
+        fileChooser.addActionListener(e -> {
+            if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
+                String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                String transcript = PdfParser.extractTextFromPDF(filePath);
                 List<Semester> semesters = DataHandler.parseTranscript(transcript);
 
-                System.out.println("Transcript: " + transcript);
-                // Clear previous text
-                textArea.setText("");
+                textArea.setText("Semester count " + semesters.size() + "\n\n");
 
-                textArea.append("Semester count: " + semesters.size() + "\n\n");
-                System.out.println("Semester count " + semesters.size());
-
-                for (Semester semester : semesters) {
-                    System.out.println("Semester: " + semester.semesterName);
-                    System.out.println("CGPA: " + semester.cgpa + ", GPA: " + semester.gpa + ", Completed Credits: "
-                            + semester.completedCredits + ", Total Credits: " + semester.totalCredits);
-                    for (Course course : semester.courses) {
-                        System.out.println(course);
-                    }
-                    System.out.println();
-                }
                 for (Semester semester : semesters) {
                     textArea.append("Semester: " + semester.semesterName + "\n");
                     textArea.append("CGPA: " + semester.cgpa + ", GPA: " + semester.gpa + ", Completed Credits: "
                             + semester.completedCredits + ", Total Credits: " + semester.totalCredits + "\n");
                     for (Course course : semester.courses) {
-                        textArea.append(course.toString() + "\n");
+                        textArea.append(course + "\n");
                     }
                     textArea.append("\n");
                 }
-
-                scrollPane.getVerticalScrollBar().setValue(0); // Scroll to the top
-                scrollPane.add(textArea); // Add the JTextArea to the JScrollPane (not the frame
-                                          // directly)
-
             }
         });
-        add(uploadButton);
 
-        add(textArea); // Add the JTextArea to the frame (not the JScrollPane, which contains the
-                       // JTextArea)
-
-        // Check eligibility button
-        JLabel resultLabel = new JLabel(" ");
-        checkButton.addActionListener(e -> {
-            // Implement eligibility checking logic here
-            resultLabel.setText("Eligible/Not Eligible");
-        });
-        add(checkButton);
-
-        // Result label
-        add(resultLabel);
     }
 
     public static void main(String[] args) {
