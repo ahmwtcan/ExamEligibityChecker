@@ -6,6 +6,7 @@ import java.util.regex.*;
 public class DataHandler {
 
     private static final Pattern SEMESTER_PATTERN = Pattern.compile("20\\d{2} (FALL|SPRING|SUMMER)");
+
     private static final Pattern COURSE_PATTERN = Pattern.compile(
             "([A-Z]+\\s\\d{3})\\s+([^0-9]+)\\s+(\\d+)\\s/\\s(\\d+)\\s([A-Z]+\\(?(AA)?\\)?|[WF])\\s(\\d+\\.\\d{2})");
     private static final Pattern SEMESTER_DETAILS_PATTERN = Pattern.compile(
@@ -50,6 +51,19 @@ public class DataHandler {
         return semesters;
     }
 
+    // count semerster number excluding summer
+    public static int countSemester(List<Semester> semesters) {
+        Pattern summerPattern = Pattern.compile("SUMMER");
+        int count = 0;
+        for (Semester semester : semesters) {
+            Matcher semesterMatcher = summerPattern.matcher(semester.semesterName);
+            if (!semesterMatcher.find()) { // If the name does not match "SUMMER"
+                count++;
+            }
+        }
+        return count;
+    }
+
     private static List<Course> parseCourses(String section) {
         List<Course> courses = new ArrayList<>();
         Matcher courseMatcher = COURSE_PATTERN.matcher(section);
@@ -75,6 +89,12 @@ public class DataHandler {
         int completedCredits;
         int totalCredits;
 
+        @Override
+        public String toString() {
+            return "Semester: " + semesterName + "\n" +
+                    "CGPA: " + cgpa + ", GPA: " + gpa + ", Completed Credits: "
+                    + completedCredits + ", Total Credits: " + totalCredits + "\n";
+        }
     }
 
     static class Course {

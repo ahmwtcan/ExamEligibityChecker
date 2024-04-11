@@ -40,28 +40,27 @@ public class PdfParser {
         String filePath = "C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\Tablo1.pdf";
         String tableText = extractTextFromPDF(filePath);
         String[] lines = tableText.split("\\r?\\n"); // Split by new lines
-        String currentCode = "";
-        String currentName = "";
+        Pattern coursePattern = Pattern.compile("([A-Z]{2,4}\\s\\d{3,4}\\*?)\\s([A-Za-z0-9\\s&,.:'-]+)");
+        Pattern splitPattern = Pattern.compile("(?<=\\*)(?=\\s[A-Z]{2,4}\\s\\d{3,4})");
+
         for (String line : lines) {
-            Matcher matcher = Pattern.compile("([A-Z]{2,4}\\s\\d{3,4})\\s([A-Za-z0-9\\s&,.:'-]+)").matcher(line);
-            if (matcher.find()) {
-                // If we have a previous course being built, add it before starting a new one
-                if (!currentCode.isEmpty()) {
-                    courses.add(new TableCourse(currentCode, currentName.trim()));
-                    currentCode = ""; // Reset for the next course
-                    currentName = "";
+            // Check if line contains a course code immediately following an asterisk
+            if (splitPattern.matcher(line).find()) {
+                // Split the line into two assuming only one such pattern exists per line
+                String[] splitCourses = splitPattern.split(line, 2);
+                for (String course : splitCourses) {
+                    Matcher matcher = coursePattern.matcher(course.trim());
+                    if (matcher.find()) {
+                        courses.add(new TableCourse(matcher.group(1), matcher.group(2)));
+                    }
                 }
-                currentCode = matcher.group(1).trim();
-                currentName = matcher.group(2).trim();
-            } else if (!currentCode.isEmpty()) {
-                // If this line doesn't match a new course but we have an ongoing course, append
-                // this line
-                currentName += " " + line.trim();
+            } else {
+                // Regular course parsing
+                Matcher matcher = coursePattern.matcher(line);
+                if (matcher.find()) {
+                    courses.add(new TableCourse(matcher.group(1), matcher.group(2)));
+                }
             }
-        }
-        // Don't forget to add the last course if present
-        if (!currentCode.isEmpty()) {
-            courses.add(new TableCourse(currentCode, currentName.trim()));
         }
         return courses;
     }

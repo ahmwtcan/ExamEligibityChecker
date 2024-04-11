@@ -65,9 +65,9 @@ public class TranscriptApp extends JFrame {
         });
 
         checkButton.addActionListener(e -> {
-            String transcript = textArea.getText();
-            List<Semester> semesters = DataHandler.parseTranscript(transcript);
-            EligibityChecker checker = new EligibityChecker();
+            // String transcript = textArea.getText();
+            // List<Semester> semesters = DataHandler.parseTranscript(transcript);
+            // EligibityChecker checker = new EligibityChecker();
             boolean isEligible = true;
             if (isEligible) {
                 JOptionPane.showMessageDialog(null, "Eligible for the exam");
@@ -88,18 +88,7 @@ public class TranscriptApp extends JFrame {
                 String filePath = fileChooser.getSelectedFile().getAbsolutePath();
                 String transcript = PdfParser.extractTextFromPDF(filePath);
                 List<Semester> semesters = DataHandler.parseTranscript(transcript);
-
-                textArea.setText("Semester count " + semesters.size() + "\n\n");
-
-                for (Semester semester : semesters) {
-                    textArea.append("Semester: " + semester.semesterName + "\n");
-                    textArea.append("CGPA: " + semester.cgpa + ", GPA: " + semester.gpa + ", Completed Credits: "
-                            + semester.completedCredits + ", Total Credits: " + semester.totalCredits + "\n");
-                    for (Course course : semester.courses) {
-                        textArea.append(course + "\n");
-                    }
-                    textArea.append("\n");
-                }
+                ;
             }
         });
 
