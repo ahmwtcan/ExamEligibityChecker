@@ -1,97 +1,104 @@
 package com.automation;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import com.automation.DataHandler.Course;
-import com.automation.DataHandler.Semester;
 
 import java.awt.*;
 import java.io.File;
-import java.util.List;
 
 public class TranscriptApp extends JFrame {
-
-    private JTextArea textArea;
+    private JButton uploadButton;
+    private JButton checkButton;
+    private JLabel pdfNameLabel;
+    private JLabel nameLabel;
+    private JTextField statusTextField;
     private JFileChooser fileChooser;
 
     public TranscriptApp() {
-        initializeComponents();
-        layoutComponents();
+        setTitle("Exam Eligibility Checker");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout()); // Main layout
+
+        // top panel for greeting
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel greetingLabel = new JLabel("Welcome to the Exam Eligibility Checker");
+        nameLabel = new JLabel("Name: ");
+        nameLabel.setVisible(false);
+        topPanel.add(greetingLabel);
+        topPanel.add(nameLabel);
+        add(topPanel, BorderLayout.CENTER);
+
+        // Center Panel for status display
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        pdfNameLabel = new JLabel("PDF Name: [none]");
+        centerPanel.add(pdfNameLabel);
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Right Panel for checkboxes
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        statusTextField = new JTextField("Exam Status");
+        statusTextField.setEditable(false);
+        rightPanel.add(statusTextField);
+        rightPanel.setVisible(true);
+        add(rightPanel, BorderLayout.EAST);
+
+        // Bottom Panel for buttons
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        uploadButton = new JButton("Upload Transcript");
+        checkButton = new JButton("Check Eligibility");
+        bottomPanel.add(uploadButton);
+        bottomPanel.add(checkButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        setSize(600, 500);
+        setLocationRelativeTo(null); // Center on screen
+
         addListeners();
     }
 
-    private void initializeComponents() {
-        setTitle("Exam Eligibility Checker");
-        setSize(500, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        textArea = new JTextArea(15, 30);
-        textArea.setEditable(false);
-
-        fileChooser = new JFileChooser(FileSystemView.getFileSystemView());
-
-    }
-
-    private void layoutComponents() {
-        // Layout Manager
-        setLayout(new BorderLayout());
-        // Inside your TranscriptApp constructor or initialization method
-        try {
-            // Replace "/path/to/logo.png" with the actual path to your logo image
-            ImageIcon imgIcon = new ImageIcon(getClass().getResource("logo.png"));
-            Image img = imgIcon.getImage();
-            this.setIconImage(img);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            // Handle the error gracefully, maybe log it or show a default icon
-        }
-        // Text area in the center with scroll
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        add(scrollPane, BorderLayout.CENTER);
-
-        // Buttons at the bottom
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton uploadButton = new JButton("Upload Transcript");
-        JButton checkButton = new JButton("Check Eligibility");
-        buttonPanel.add(uploadButton);
-        buttonPanel.add(checkButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+    private void addListeners() {
         uploadButton.addActionListener(e -> {
-            int returnValue = fileChooser.showOpenDialog(null);
+            // File chooser for selecting the transcript
+            fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PDF files", "pdf"));
+
+            int returnValue = fileChooser.showOpenDialog(TranscriptApp.this);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
-                System.out.println(selectedFile.getAbsolutePath());
+                pdfNameLabel.setText("Loaded: " + selectedFile.getName());
+
+                String transcript = PdfParser.extractTextFromPDF(selectedFile.getAbsolutePath());
+
+                // get student from transcript
+                Student student = DataHandler.getStudent(transcript);
+                nameLabel.setText(" " + student.name);
+                nameLabel.setVisible(true);
+                System.out.println(student);
+
+                // Here you would use the parsed transcript to check eligibility
+                boolean isEligible = true; // This would be determined by your actual checking logic
+
+                if (isEligible) {
+                    statusTextField.setText("Eligible for the exam");
+                } else {
+                    statusTextField.setText("Not eligible for the exam");
+                }
+
             }
         });
 
         checkButton.addActionListener(e -> {
-            // String transcript = textArea.getText();
-            // List<Semester> semesters = DataHandler.parseTranscript(transcript);
-            // EligibityChecker checker = new EligibityChecker();
-            boolean isEligible = true;
+            // Here you would use the parsed transcript to check eligibility
+            boolean isEligible = true; // This would be determined by your actual checking logic
             if (isEligible) {
-                JOptionPane.showMessageDialog(null, "Eligible for the exam");
+                JOptionPane.showMessageDialog(TranscriptApp.this, "Eligible for the exam");
+
             } else {
-                JOptionPane.showMessageDialog(null, "Not eligible for the exam");
+                JOptionPane.showMessageDialog(TranscriptApp.this, "Not eligible for the exam");
             }
         });
-    }
-
-    private void addListeners() {
-
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PDF files", "pdf"));
-
-        fileChooser.addActionListener(e -> {
-            if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
-                String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                String transcript = PdfParser.extractTextFromPDF(filePath);
-                List<Semester> semesters = DataHandler.parseTranscript(transcript);
-                ;
-            }
-        });
-
     }
 
     public static void main(String[] args) {

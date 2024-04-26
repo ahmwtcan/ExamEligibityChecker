@@ -1,69 +1,163 @@
 package com.automation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.automation.DataHandler.Course;
-import com.automation.DataHandler.Semester;
 import com.automation.PdfParser.TableCourse;
 
 public class EligibityChecker {
 
     List<TableCourse> tableCourses = PdfParser.parseTableCourses();
-    private static final Map<String, Double> gradePoints = Map.of(
-            "AA", 4.0,
-            "BA", 3.5,
-            "BB", 3.0,
-            "CB", 2.5,
-            "CC", 2.0,
-            "DC", 1.5,
-            "DD", 1.0,
-            "FA", 0.0,
-            "FF", 0.0);
 
-    public boolean checkEligibility(Student student) {
-
+    public EligibilityProcess checkEligibility(Student student) {
+        EligibilityProcess process = new EligibilityProcess();
+        // 2.Step
         // if student has a W OR L Grade in any course beside creditless Language
         // courses, return false
-        for (Course course : student.courses) {
-            if (course.credits != 0 && (course.grade.equals("W") || course.grade.equals("L"))) {
-                return false;
+        if (!checkWithdrawalsAndLeaves(student)) {
+            process.WorLflag = false;
+        } else {
+            System.out.println("Student has no W or L grade in any course beside creditless Language courses");
+        }
+
+        // 3. Step
+        // if student has an internship course and grade is not P, return false
+
+        if (!checkInternship(student)) {
+            System.out.println("Student has not passed the internship course");
+            process.internshipFlag = false;
+        } else {
+            System.out.println("Student has passed the internship course");
+        }
+
+        // 4. Step
+        if (!student.isAllCoursesTaken) {
+            System.out.println("Student has not taken all courses");
+            process.allCoursesFlag = false;
+        } else {
+            System.out.println("Student has taken all courses");
+        }
+        // 5. Step
+        if (!checkTableCourses(student)) {
+            System.out.println("Student has a FF grade in a table course");
+            process.tableCourseFlag = false;
+        } else {
+            System.out.println("Student has no FF grade in a table course");
+        }
+
+        // 6. Step
+        if (!checkGPA(student)) {
+            System.out.println("Student's GPA is less than 2.0");
+            process.GPAFlag = false;
+        } else {
+            System.out.println("Student's GPA is above 2.0");
+        }
+
+        // 7. Step
+        if (canGradeImprovementRaiseCGPA(student.semesters, tableCourses)) {
+            System.out.println("Student can improve a grade to raise CGPA above 2.0");
+            process.gradeImprovementFlag = true;
+        }
+
+        // 8. Step
+        if (student.maxStudyDurationExceeded) {
+
+            // if student has a FF grade in any table course or has a W or L grade in more
+            // than 5 courses, return false
+            if (!checkTableCourses(student)) {
+                process.FFgradeFlag = false;
             }
 
-            checkInternship(course); // if student has an internship course and grade is not P, return false
         }
 
-        return true;
+        return process;
 
     }
 
-    private boolean checkInternship(Course course) {
-        String intershipRegex = "([A-Z]{2}400)";
+    public boolean checkWithdrawalsAndLeaves(Student student) {
+        HashMap<String, List<String>> courseGrades = new HashMap<>();
 
-        if (!course.code.matches(intershipRegex)) {
-            return false;
-        }
-        if (course.code.matches(intershipRegex) && !course.grade.equals("P")) {
-            return false;
-        }
-
-        return true;
-    }
-
-    // if student has a FF grade in any table course, return false
-    // else if student has a FF grade in any other course then he/she should have
-
-    public boolean checkTableCourses(Student student) {
+        // Collect all grades for each course
         for (Course course : student.courses) {
-            for (TableCourse tableCourse : tableCourses) {
-                if (course.code.equals(tableCourse.getCode()) && course.grade.equals("FF")) {
+            courseGrades.putIfAbsent(course.code, new ArrayList<>());
+            courseGrades.get(course.code).add(course.grade);
+        }
+
+        // Check for W or L grades and validate subsequent completion
+        for (Map.Entry<String, List<String>> entry : courseGrades.entrySet()) {
+            boolean hasWithdrawalOrLeave = entry.getValue().stream()
+                    .anyMatch(grade -> grade.equals("W") || grade.equals("L"));
+            if (hasWithdrawalOrLeave) {
+                // Check for any subsequent passing grade
+                boolean hasPassedSubsequently = entry.getValue().stream()
+                        .anyMatch(grade -> isPassingGrade(grade));
+                if (!hasPassedSubsequently) {
+                    System.out.println(
+                            "Student has a W or L grade without passing subsequently in course: " + entry.getKey());
                     return false;
-                } else if (!course.code.equals(tableCourse.getCode()) && course.grade.equals("FF")) {
-                    return true;
                 }
             }
         }
+
+        return true;
+    }
+
+    private boolean isPassingGrade(String grade) {
+        // Define passing grades based on the academic grading system
+        return !grade.matches("W|L|F|FF|FA");
+    }
+
+    private boolean checkInternship(Student student) {
+        String intershipRegex = "([A-Z]{2,3} 400)";
+
+        for (Course course : student.courses) {
+            if (course.code.matches(intershipRegex) && !course.grade.equals("P")) {
+                System.out.println("Student has not passed the internship course: " + course.code);
+                return false;
+            } else if (course.code.matches(intershipRegex) && course.grade.equals("P")) {
+                System.out.println("Student has passed the internship course: " + course.code + "  " + course.grade);
+                return true;
+            }
+        }
+        System.out.println("Student has not taken the internship course");
+        return false;
+    }
+
+    // if student has a FF grade in any table course, return false
+    // else if student has only 1 FF grade in any other course then he/she should
+    // have exam right
+    public boolean checkTableCourses(Student student) {
+        HashMap<String, List<String>> courseGrades = new HashMap<>();
+
+        // Collect all grades for each course
+        for (Course course : student.courses) {
+            courseGrades.putIfAbsent(course.code, new ArrayList<>());
+            courseGrades.get(course.code).add(course.grade);
+        }
+
+        // Check each course for the presence of an 'FF' grade and a subsequent passing
+        // grade
+        for (Map.Entry<String, List<String>> entry : courseGrades.entrySet()) {
+            if (entry.getValue().contains("FF")) {
+                // Check if there is a retake that is passed
+                boolean hasPassedRetake = false;
+                for (String grade : entry.getValue()) {
+                    if (!grade.equals("FF") && !grade.equals("W") && !grade.equals("L") && !grade.equals("FA")) {
+                        hasPassedRetake = true;
+                        break;
+                    }
+                }
+                // If there's no successful retake, return false
+                if (!hasPassedRetake) {
+                    System.out.println("Student failed to pass after an FF in course: " + entry.getKey());
+                    return false;
+                }
+            }
+        }
+
+        // If all failing courses were later passed, return true
         return true;
     }
 
@@ -84,16 +178,18 @@ public class EligibityChecker {
 
     public boolean checkGPA(Student student) {
         // if student's GPA is less than 2.0, return false
-        if (student.gpa < 2.0) {
+        if (student.cgpa < 2.0) {
+            System.out.println("Student's GPA is less than 2.0 " + student.cgpa);
             return false;
         }
         return true;
     }
 
-    public static boolean canGradeImprovementRaiseCGPA(List<Semester> semesters, List<String> table1Courses) {
+    public static boolean canGradeImprovementRaiseCGPA(List<Semester> semesters, List<TableCourse> table1Courses) {
         // Assume CGPA is taken from the last semester's CGPA
-        double currentCGPA = Integer.parseInt(semesters.get(semesters.size() - 1).cgpa);
+        double currentCGPA = Double.parseDouble(semesters.get(semesters.size() - 1).cgpa);
         if (currentCGPA >= 2.00) {
+            System.out.println("Student's CGPA is already above 2.0: " + currentCGPA);
             return false; // Already meets or exceeds the threshold
         }
 
@@ -102,8 +198,14 @@ public class EligibityChecker {
         double totalGradePoints = 0;
         for (Semester semester : semesters) {
             for (Course course : semester.courses) {
-                // Skip courses from Table 1 and courses with 'P' grade or 'FF' grade
-                if (!table1Courses.contains(course.code) && !course.grade.equals("P") && !course.grade.equals("FF")) {
+                boolean containsCode = false;
+                for (TableCourse tableCourse : table1Courses) {
+                    if (tableCourse.getCode().equals(course.code)) {
+                        containsCode = true;
+                        break;
+                    }
+                }
+                if (!containsCode && !course.grade.equals("P") && !course.grade.equals("FF")) {
                     double gradePoints = getGradePoints(course.grade);
                     totalCredits += course.credits;
                     totalGradePoints += gradePoints * course.credits;
@@ -111,24 +213,32 @@ public class EligibityChecker {
             }
         }
 
-        // The simplest improvement scenario: improving the grade of any course to the
-        // next level
-        // This simulates the minimal improvement necessary to check if CGPA can be
-        // raised above 2.00
-        double improvedGradePoints = getGradePoints("BA"); // Assuming BA as a significant improvement
-        for (Course course : semesters.get(semesters.size() - 1).courses) {
-            if (!course.grade.equals("P") && !course.grade.equals("FF") && !table1Courses.contains(course.code)) {
-                // Calculate potential CGPA with an improved grade for this course
-                double newTotalGradePoints = totalGradePoints - (getGradePoints(course.grade) * course.credits)
-                        + (improvedGradePoints * course.credits);
-                double potentialCGPA = newTotalGradePoints / totalCredits;
-                if (potentialCGPA >= 2.00) {
-                    return true; // Found a course improvement that can raise CGPA above 2.00
+        // Iterate over each course and simulate incremental grade improvements
+        for (Semester semester : semesters) {
+            for (Course course : semester.courses) {
+                boolean containsCode = false;
+                for (TableCourse tableCourse : table1Courses) {
+                    if (tableCourse.getCode().equals(course.code)) {
+                        containsCode = true;
+                        break;
+                    }
+                }
+                if (!course.grade.equals("P") && !course.grade.equals("FF") && !containsCode) {
+                    String currentGrade = course.grade;
+                    while (!currentGrade.equals("AA")) { // Assuming "AA" is the highest grade
+                        currentGrade = getNextHigherGrade(currentGrade);
+                        double improvedGradePoints = getGradePoints(currentGrade);
+                        double newTotalGradePoints = totalGradePoints - (getGradePoints(course.grade) * course.credits)
+                                + (improvedGradePoints * course.credits);
+                        double potentialCGPA = newTotalGradePoints / totalCredits;
+                        if (potentialCGPA >= 2.00) {
+                            return true; // Found a course improvement that can raise CGPA above 2.00
+                        }
+                    }
                 }
             }
         }
-
-        return false; // No single course improvement found that can raise CGPA above 2.00
+        return false;
     }
 
     // Convert a letter grade to grade pointss
@@ -147,58 +257,16 @@ public class EligibityChecker {
         };
     }
 
-    public class Student {
-        private String id;
-        private String name;
-        private double gpa; // Genel Not Ortalaması
-        private List<Course> courses; // Alınan dersler listesi
-        private boolean maxStudyDurationExceeded; // Azami öğrenim süresi aşıldı mı?
-        private AcademicStatus academicStatus;
-
-        // Gerekli getter ve setter metodları
-
-        Student(String id, String name, double gpa, List<Course> courses, boolean maxStudyDurationExceeded,
-                AcademicStatus academicStatus) {
-            this.id = id;
-            this.name = name;
-            this.gpa = gpa;
-            this.courses = courses;
-            this.maxStudyDurationExceeded = maxStudyDurationExceeded;
-            this.academicStatus = academicStatus;
-        }
-
-        @Override
-        public String toString() {
-            return "Student{" +
-                    "id='" + id + '\'' +
-                    ", name='" + name + '\'' +
-                    ", gpa=" + gpa +
-                    ", courses=" + courses +
-                    ", maxStudyDurationExceeded=" + maxStudyDurationExceeded +
-                    ", academicStatus=" + academicStatus +
-                    '}';
-        }
-
-    }
-
-    public class AcademicStatus {
-        private boolean compulsoryInternshipCompleted; // Zorunlu staj tamamlandı mı?
-        private ExamRight examRight; // Sınav hakkı
-
-        // Gerekli getter ve setter metodları
-
-        AcademicStatus(boolean compulsoryInternshipCompleted, ExamRight examRight) {
-            this.compulsoryInternshipCompleted = compulsoryInternshipCompleted;
-            this.examRight = examRight;
-        }
-
-        @Override
-        public String toString() {
-            return "AcademicStatus{" +
-                    "compulsoryInternshipCompleted=" + compulsoryInternshipCompleted +
-                    ", examRight=" + examRight +
-                    '}';
-        }
+    private static String getNextHigherGrade(String currentGrade) {
+        return switch (currentGrade) {
+            case "DD" -> "DC";
+            case "DC" -> "CC";
+            case "CC" -> "CB";
+            case "CB" -> "BB";
+            case "BB" -> "BA";
+            case "BA" -> "AA";
+            default -> currentGrade; // No higher grade available or unrecognized grade
+        };
     }
 
     public enum ExamRight {
@@ -208,26 +276,16 @@ public class EligibityChecker {
         HAK_YOK
     }
 
-    public class ExamStatus {
-        private Course course;
-        private ExamRight examRight;
-        private boolean isUsed; // Sınav hakkı kullanıldı mı?
-
-        // Gerekli getter ve setter metodları
-
-        ExamStatus(Course course, ExamRight examRight, boolean isUsed) {
-            this.course = course;
-            this.examRight = examRight;
-            this.isUsed = isUsed;
-        }
-
-        @Override
-        public String toString() {
-            return "ExamStatus{" +
-                    "course=" + course +
-                    ", examRight=" + examRight +
-                    ", isUsed=" + isUsed +
-                    '}';
-        }
+    public class EligibilityProcess {
+        boolean WorLflag;
+        boolean internshipFlag;
+        boolean allCoursesFlag;
+        boolean tableCourseFlag;
+        boolean GPAFlag;
+        boolean FFgradeFlag;
+        boolean maxStudyDurationFlag;
+        boolean gradeImprovementFlag;
+        ExamRight examRight;
     }
+
 }

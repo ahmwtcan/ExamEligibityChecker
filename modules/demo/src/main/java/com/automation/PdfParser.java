@@ -14,13 +14,10 @@ public class PdfParser {
 
     public static void main(String[] args) {
 
-        List<TableCourse> courses = parseTableCourses();
+        String transs = extractTextFromPDF(
+                "C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\transkipt.pdf");
 
-        System.out.println("Courses: ");
-        System.out.println("Course count: " + courses.size());
-        for (TableCourse course : courses) {
-            System.out.println(course.getCode() + " " + course.getName());
-        }
+        System.out.println(transs);
     }
 
     public static String extractTextFromPDF(String filePath) {
