@@ -1,0 +1,46 @@
+[
+    {
+        "startNode": {
+            "id": "0",
+            "text": "Start"
+        },
+        "endNode": {
+            "id": "4",
+            "text": "Decision"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "4",
+            "text": "Decision"
+        },
+        "endNode": {
+            "id": "3",
+            "text": "Decision"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "4",
+            "text": "Decision"
+        },
+        "endNode": {
+            "id": "2",
+            "text": "Condition"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "2",
+            "text": "Condition"
+        },
+        "endNode": {
+            "id": "5",
+            "text": "CGPA Threshold: 0.0"
+        },
+        "type": true
+    }
+]

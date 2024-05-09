@@ -45,7 +45,8 @@ public class DataHandler {
                 completedCredits += semester.completedCredits;
             }
 
-            return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true);
+            return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true,
+                    false);
 
         } else {
             System.out.println("Failed to match extended info. Check regex and transcript format.");

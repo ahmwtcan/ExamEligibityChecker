@@ -13,66 +13,122 @@ public class EligibityChecker {
 
     public EligibilityProcess checkEligibility(Student student) {
         EligibilityProcess process = new EligibilityProcess();
+
+        // 1. Step
+        if (student.maxStudyDurationExceeded) {
+            System.out.println("Student has exceeded the maximum study duration");
+            // if student has a FF grade in any table course or has a W or L grade in more
+            // than 5 courses, return false
+
+            if (!checkTableCourses(student) || !checkWorLgrades(student)) {
+                process.tableCourseFlag = true;
+                process.examRight = ExamRight.ILISIGI_KESILDI;
+                return process;
+            }
+            long ffCount = checkFFgrades(student);
+            System.out.println("Student has " + ffCount + " FF grades");
+            if (ffCount > 5) {
+
+                if (process.gotExamRightAndUsed) {
+                    process.examRight = ExamRight.ILISIGI_KESILDI;
+                    return process;
+                }
+                process.examRight = ExamRight.EK_SINAV;
+                System.out.println("Student has more than 5 FF grades");
+                process.FFgradeFlag = true;
+                return process;
+            } else if ((6 > ffCount >> 1)) {
+                System.out.println("Student has " + ffCount + " FF grades");
+                process.FFgradeFlag = false;
+                process.examRight = ExamRight.EK_SINAV;
+                return process;
+            } else if (ffCount == 1) {
+                System.out.println("Student has 1 FF grade");
+                process.FFgradeFlag = false;
+                process.examRight = ExamRight.SINIRSIZ_SINAV;
+                return process;
+            }
+
+            // check gpa
+            process.GPAFlag = checkGPA(student);
+
+            if (!process.GPAFlag) {
+                process.examRight = ExamRight.SINIRSIZ_SINAV;
+                return process;
+            } else if (!process.GPAFlag && !checkTableCourses(student)) {
+                process.examRight = ExamRight.SINIRSIZ_SINAV;
+                return process;
+            }
+
+        }
         // 2.Step
         // if student has a W OR L Grade in any course beside creditless Language
         // courses, return false
         if (!checkWithdrawalsAndLeaves(student)) {
-            process.WorLflag = false;
+            process.WorLflag = true;
+            process.examRight = ExamRight.ILISIGI_KESILDI;
         } else {
             System.out.println("Student has no W or L grade in any course beside creditless Language courses");
         }
-
         // 3. Step
         // if student has an internship course and grade is not P, return false
-
         if (!checkInternship(student)) {
             System.out.println("Student has not passed the internship course");
-            process.internshipFlag = false;
+            process.internshipFlag = true;
         } else {
+            process.internshipFlag = false;
             System.out.println("Student has passed the internship course");
         }
 
         // 4. Step
         if (!student.isAllCoursesTaken) {
             System.out.println("Student has not taken all courses");
-            process.allCoursesFlag = false;
+            process.allCoursesFlag = true;
         } else {
+            process.allCoursesFlag = false;
             System.out.println("Student has taken all courses");
         }
         // 5. Step
-        if (!checkTableCourses(student)) {
-            System.out.println("Student has a FF grade in a table course");
-            process.tableCourseFlag = false;
+        long FirstffCount = checkFFgrades(student);
+        if (FirstffCount == 1) {
+            Boolean flag = checkTableCourses(student);
+            if (flag) {
+                System.out.println("Student has a FF grade in any table course");
+                process.tableCourseFlag = true;
+                process.examRight = ExamRight.HAK_YOK;
+                return process;
+            }
+            System.out.println("Student has only 1 FF grade");
+            process.FFgradeFlag = false;
+            process.examRight = ExamRight.EK_SINAV;
+            return process;
+        } else if (FirstffCount > 1) {
+            System.out.println("Student has more than 1 FF grade");
+            process.FFgradeFlag = true;
+            process.examRight = ExamRight.HAK_YOK;
+            return process;
         } else {
-            System.out.println("Student has no FF grade in a table course");
+            process.FFgradeFlag = false;
         }
 
         // 6. Step
         if (!checkGPA(student)) {
             System.out.println("Student's GPA is less than 2.0");
-            process.GPAFlag = false;
-        } else {
-            System.out.println("Student's GPA is above 2.0");
-        }
+            process.GPAFlag = true;
 
-        // 7. Step
-        if (canGradeImprovementRaiseCGPA(student.semesters, tableCourses)) {
-            System.out.println("Student can improve a grade to raise CGPA above 2.0");
-            process.gradeImprovementFlag = true;
-        }
-
-        // 8. Step
-        if (student.maxStudyDurationExceeded) {
-
-            // if student has a FF grade in any table course or has a W or L grade in more
-            // than 5 courses, return false
-            if (!checkTableCourses(student)) {
-                process.FFgradeFlag = false;
+            if (canGradeImprovementRaiseCGPA(student.semesters, tableCourses)) {
+                System.out.println("Student can improve a grade to raise CGPA above 2.0");
+                process.gradeImprovementFlag = true;
+                process.examRight = ExamRight.EK_SINAV;
             }
-
+            process.examRight = ExamRight.HAK_YOK;
+            return process;
+        } else {
+            process.GPAFlag = false;
+            System.out.println("Student's GPA is above 2.0");
+            process.examRight = ExamRight.HAK_YOK;
+            return process;
         }
-
-        return process;
 
     }
 
@@ -156,24 +212,55 @@ public class EligibityChecker {
                 }
             }
         }
-
         // If all failing courses were later passed, return true
         return true;
     }
 
-    public boolean checkFFgrades(Student student) {
-        // if student has a FF grade more than once, return false
-        int count = 0;
-        for (Course course : student.courses) {
-            if (course.grade.equals("FF")) {
-                count++;
-            }
-        }
-        if (count > 1) {
-            return false;
-        }
-        return true;
+    public long checkFFgrades(Student student) {
+        // Map to store the best grade per course.
+        Map<String, String> bestGrades = new HashMap<>();
 
+        // Iterate over courses to populate the map with the best grade per course.
+        for (Course course : student.courses) {
+            bestGrades.compute(course.code, (key, currentBestGrade) -> {
+                if (currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)) {
+                    return course.grade; // If it's the first grade or higher than the current, store it.
+                } else {
+                    return currentBestGrade; // Otherwise, keep the current best grade.
+                }
+            });
+        }
+
+        // Count the number of courses where the best grade is still a failing grade
+        // ('FF' or 'FA').
+        return bestGrades.values().stream()
+                .filter(grade -> grade.equals("FF") || grade.equals("FA"))
+                .count();
+    }
+
+    public boolean checkWorLgrades(Student student) {
+        // Create a map to keep track of the highest grade for each course
+        Map<String, String> highestGrades = new HashMap<>();
+        for (Course course : student.courses) {
+            highestGrades.merge(course.code, course.grade,
+                    (oldGrade, newGrade) -> isHigherGrade(newGrade, oldGrade) ? newGrade : oldGrade);
+        }
+
+        // Count courses with only 'W' or 'L' as the highest grade
+        long wlCount = highestGrades.values().stream().filter(grade -> grade.equals("W") || grade.equals("L")).count();
+
+        System.out.println("Student has " + wlCount + " courses with only W or L grades");
+        return wlCount <= 5;
+    }
+
+    private boolean isHigherGrade(String newGrade, String oldGrade) {
+        // The order of grades from best to worst, with 'AA' being the best and 'FF' and
+        // 'FA' both being failing grades.
+        List<String> gradesOrder = List.of("AA", "BA", "BB", "CB", "CC", "DC", "DD", "FD", "FF", "FA");
+
+        // If the new grade comes before the old grade in this list, it's higher
+        // (better).
+        return gradesOrder.indexOf(newGrade) < gradesOrder.indexOf(oldGrade);
     }
 
     public boolean checkGPA(Student student) {
@@ -273,7 +360,9 @@ public class EligibityChecker {
         EK_SINAV,
         SINIRSIZ_SINAV,
         BELIRLI_DONEM_SINAV_HAKKI,
-        HAK_YOK
+        HAK_YOK,
+        DERSE_DEVAM,
+        ILISIGI_KESILDI
     }
 
     public class EligibilityProcess {
@@ -285,7 +374,23 @@ public class EligibityChecker {
         boolean FFgradeFlag;
         boolean maxStudyDurationFlag;
         boolean gradeImprovementFlag;
+        boolean gotExamRight;
+        boolean gotExamRightAndUsed;
         ExamRight examRight;
+
+        public EligibilityProcess() {
+            this.WorLflag = false;
+            this.internshipFlag = false;
+            this.allCoursesFlag = false;
+            this.tableCourseFlag = false;
+            this.GPAFlag = false;
+            this.FFgradeFlag = false;
+            this.maxStudyDurationFlag = false;
+            this.gradeImprovementFlag = false;
+            this.gotExamRight = false;
+            this.gotExamRightAndUsed = false;
+            this.examRight = ExamRight.BELIRLI_DONEM_SINAV_HAKKI;
+        }
     }
 
 }
