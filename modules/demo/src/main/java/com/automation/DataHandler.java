@@ -46,7 +46,7 @@ public class DataHandler {
             }
 
             return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true,
-                    false);
+                    false, countSemester(semesters));
 
         } else {
             System.out.println("Failed to match extended info. Check regex and transcript format.");

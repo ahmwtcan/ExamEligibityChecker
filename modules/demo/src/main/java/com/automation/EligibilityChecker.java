@@ -4,28 +4,49 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.automation.PdfParser.TableCourse;
 
-public class EligibityChecker {
+public class EligibilityChecker {
+    private Map<String, Predicate<Student>> checkers = new HashMap<>();
+    EligibilityProcess process = new EligibilityProcess();
+    double requiredGPA = 2.0;
+    double requiredCGPA = 0.0;
+    int maxStudyDuration = 14;
+    int maxFFCount = 5;
+    int maxWLCount = 5;
+    int minFFCount = 1;
+    int minWLCount = 1;
 
     List<TableCourse> tableCourses = PdfParser.parseTableCourses();
 
-    public EligibilityProcess checkEligibility(Student student) {
-        EligibilityProcess process = new EligibilityProcess();
+    public EligibilityChecker() {
+        // Initialize the map with method references to your checking functions
+        checkers.put("checkMaxStudyDuration", student -> checkMaxStudyDuration(student, 12));
+        checkers.put("checkWithdrawalsAndLeaves", this::checkWithdrawalsAndLeaves);
+        checkers.put("checkInternship", this::checkInternship);
+        checkers.put("checkTableCourses", student -> checkTableCourses(student));
+        checkers.put("checkGPA", student -> checkGPA(student, requiredGPA));
+    }
 
+    public EligibilityProcess checkEligibility(Student student) {
+
+        // Check the student's eligibility for the exam right
+
+        checkMaxStudyDuration(student, maxStudyDuration);
         // 1. Step
         if (student.maxStudyDurationExceeded) {
             System.out.println("Student has exceeded the maximum study duration");
             // if student has a FF grade in any table course or has a W or L grade in more
             // than 5 courses, return false
 
-            if (!checkTableCourses(student) || !checkWorLgrades(student)) {
+            if (!checkTableCourses(student) || !checkWorLgrades(student, maxWLCount, minWLCount)) {
                 process.tableCourseFlag = true;
                 process.examRight = ExamRight.ILISIGI_KESILDI;
                 return process;
             }
-            long ffCount = checkFFgrades(student);
+            long ffCount = countFFgrades(student);
             System.out.println("Student has " + ffCount + " FF grades");
             if (ffCount > 5) {
 
@@ -50,7 +71,7 @@ public class EligibityChecker {
             }
 
             // check gpa
-            process.GPAFlag = checkGPA(student);
+            process.GPAFlag = checkGPA(student, requiredGPA);
 
             if (!process.GPAFlag) {
                 process.examRight = ExamRight.SINIRSIZ_SINAV;
@@ -73,11 +94,9 @@ public class EligibityChecker {
         // 3. Step
         // if student has an internship course and grade is not P, return false
         if (!checkInternship(student)) {
-            System.out.println("Student has not passed the internship course");
             process.internshipFlag = true;
         } else {
             process.internshipFlag = false;
-            System.out.println("Student has passed the internship course");
         }
 
         // 4. Step
@@ -89,7 +108,14 @@ public class EligibityChecker {
             System.out.println("Student has taken all courses");
         }
         // 5. Step
-        long FirstffCount = checkFFgrades(student);
+        long FirstffCount = countFFgrades(student);
+
+        System.out.println("Student has " + FirstffCount + " FF grades");
+
+        boolean flag1 = checkFFgrades(student, minFFCount, maxFFCount);
+
+        System.out.println("Student has " + flag1 + " ahmetcan");
+
         if (FirstffCount == 1) {
             Boolean flag = checkTableCourses(student);
             if (flag) {
@@ -112,8 +138,8 @@ public class EligibityChecker {
         }
 
         // 6. Step
-        if (!checkGPA(student)) {
-            System.out.println("Student's GPA is less than 2.0");
+        if (!checkGPA(student, requiredGPA)) {
+            System.out.println("Student's GPA is less than " + requiredGPA);
             process.GPAFlag = true;
 
             if (canGradeImprovementRaiseCGPA(student.semesters, tableCourses)) {
@@ -160,12 +186,25 @@ public class EligibityChecker {
         return true;
     }
 
+    boolean checkMaxStudyDuration(Student student, int threshold) {
+
+        if (student.semesterCount >= threshold) {
+            System.out.println("treshold " + (threshold));
+            System.out.println("Student has exceeded the maximum study duration");
+            student.maxStudyDurationExceeded = true;
+            return true;
+        }
+        student.maxStudyDurationExceeded = false;
+        return false;
+
+    }
+
     private boolean isPassingGrade(String grade) {
         // Define passing grades based on the academic grading system
         return !grade.matches("W|L|F|FF|FA");
     }
 
-    private boolean checkInternship(Student student) {
+    boolean checkInternship(Student student) {
         String intershipRegex = "([A-Z]{2,3} 400)";
 
         for (Course course : student.courses) {
@@ -177,7 +216,6 @@ public class EligibityChecker {
                 return true;
             }
         }
-        System.out.println("Student has not taken the internship course");
         return false;
     }
 
@@ -216,41 +254,97 @@ public class EligibityChecker {
         return true;
     }
 
-    public long checkFFgrades(Student student) {
-        // Map to store the best grade per course.
+    public boolean checkFFgrades(Student student, int maxFFCount, int minFFCount) {
         Map<String, String> bestGrades = new HashMap<>();
 
-        // Iterate over courses to populate the map with the best grade per course.
         for (Course course : student.courses) {
-            bestGrades.compute(course.code, (key, currentBestGrade) -> {
-                if (currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)) {
-                    return course.grade; // If it's the first grade or higher than the current, store it.
-                } else {
-                    return currentBestGrade; // Otherwise, keep the current best grade.
-                }
-            });
+            bestGrades.compute(course.code,
+                    (key, currentBestGrade) -> currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)
+                            ? course.grade
+                            : currentBestGrade);
         }
 
-        // Count the number of courses where the best grade is still a failing grade
-        // ('FF' or 'FA').
-        return bestGrades.values().stream()
+        long failingGradesCount = bestGrades.values().stream()
                 .filter(grade -> grade.equals("FF") || grade.equals("FA"))
                 .count();
+
+        System.out.println("Student has " + failingGradesCount + " courses with only FF or FA grades sasda");
+
+        // Check if the count of failing grades is within the specified range
+        return (failingGradesCount >= minFFCount && failingGradesCount < maxFFCount);
     }
 
-    public boolean checkWorLgrades(Student student) {
-        // Create a map to keep track of the highest grade for each course
+    public long countFFgrades(Student student) {
+        Map<String, String> bestGrades = new HashMap<>();
+
+        for (Course course : student.courses) {
+            bestGrades.compute(course.code,
+                    (key, currentBestGrade) -> currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)
+                            ? course.grade
+                            : currentBestGrade);
+        }
+
+        long failingGradesCount = bestGrades.values().stream()
+                .filter(grade -> grade.equals("FF") || grade.equals("FA"))
+                .count();
+
+        return failingGradesCount;
+    }
+
+    public boolean checkWorLgrades(Student student, int maxWLCount, int minWLCount) {
+        Map<String, List<String>> courseGrades = new HashMap<>();
+
+        // Collect all grades for each course
+        for (Course course : student.courses) {
+            courseGrades.computeIfAbsent(course.code, k -> new ArrayList<>()).add(course.grade);
+        }
+
+        // Count the number of courses where the final or highest grade is still W or L,
+        // but also check if there is a subsequent passing grade.
+        long wlCount = 0;
+        for (Map.Entry<String, List<String>> entry : courseGrades.entrySet()) {
+            List<String> grades = entry.getValue();
+            String highestGrade = grades.stream().reduce("",
+                    (max, cur) -> max.isEmpty() || isHigherGrade(cur, max) ? cur : max);
+
+            if ((highestGrade.equals("W") || highestGrade.equals("L")) && !hasSubsequentPassingGrade(grades)) {
+                wlCount++;
+            }
+        }
+
+        System.out.println("Student has " + wlCount + " courses with only unresolved W or L grades ahmet");
+        return wlCount >= minWLCount && wlCount < maxWLCount;
+    }
+
+    private boolean hasSubsequentPassingGrade(List<String> grades) {
+        // Check if there's any passing grade after a W or L
+        return grades.stream().anyMatch(this::isPassingGrade);
+    }
+
+    public long countWorLgrades(Student student) {
         Map<String, String> highestGrades = new HashMap<>();
         for (Course course : student.courses) {
             highestGrades.merge(course.code, course.grade,
                     (oldGrade, newGrade) -> isHigherGrade(newGrade, oldGrade) ? newGrade : oldGrade);
         }
 
-        // Count courses with only 'W' or 'L' as the highest grade
-        long wlCount = highestGrades.values().stream().filter(grade -> grade.equals("W") || grade.equals("L")).count();
+        long wlCount = highestGrades.values().stream()
+                .filter(grade -> grade.equals("W") || grade.equals("L"))
+                .count();
 
         System.out.println("Student has " + wlCount + " courses with only W or L grades");
-        return wlCount <= 5;
+        return wlCount;
+    }
+
+    public long countFailedCourses(Student student) {
+
+        return countFFgrades(student) + countWorLgrades(student);
+    }
+
+    public boolean checkFailedCourses(Student student, int max, int min) {
+        long failedCourses = countFailedCourses(student);
+
+        return failedCourses >= min && failedCourses <= max;
     }
 
     private boolean isHigherGrade(String newGrade, String oldGrade) {
@@ -263,10 +357,10 @@ public class EligibityChecker {
         return gradesOrder.indexOf(newGrade) < gradesOrder.indexOf(oldGrade);
     }
 
-    public boolean checkGPA(Student student) {
+    public boolean checkGPA(Student student, double requiredGPA) {
         // if student's GPA is less than 2.0, return false
-        if (student.cgpa < 2.0) {
-            System.out.println("Student's GPA is less than 2.0 " + student.cgpa);
+        if (student.cgpa <= requiredGPA) {
+            System.out.println("Student's GPA is less than " + requiredGPA + student.cgpa);
             return false;
         }
         return true;
@@ -377,6 +471,7 @@ public class EligibityChecker {
         boolean gotExamRight;
         boolean gotExamRightAndUsed;
         ExamRight examRight;
+        String message;
 
         public EligibilityProcess() {
             this.WorLflag = false;
@@ -390,6 +485,7 @@ public class EligibityChecker {
             this.gotExamRight = false;
             this.gotExamRightAndUsed = false;
             this.examRight = ExamRight.BELIRLI_DONEM_SINAV_HAKKI;
+            this.message = "";
         }
     }
 

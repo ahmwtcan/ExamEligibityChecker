@@ -2,11 +2,13 @@ package com.automation;
 
 import javax.swing.*;
 
-import com.automation.EligibityChecker.EligibilityProcess;
+import com.automation.EligibilityChecker.EligibilityProcess;
 
 import java.util.List;
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class GUI1 extends JFrame {
 
@@ -14,7 +16,7 @@ public class GUI1 extends JFrame {
     private JLabel pdfNameLabel, nameLabel, statusLabel;
     private JFileChooser fileChooser;
     private JProgressBar progressBar;
-    private EligibityChecker eligibilityChecker = new EligibityChecker();
+    private EligibilityChecker eligibilityChecker = new EligibilityChecker();
     private Student currentStudent;
     private JPanel flagsPanel;
 
@@ -94,7 +96,14 @@ public class GUI1 extends JFrame {
         checkButton = new JButton("Check Eligibility");
         nameLabel.setVisible(false);
         uploadButton.addActionListener(e -> uploadAction());
-        checkButton.addActionListener(e -> checkEligibilityAction());
+        checkButton.addActionListener(e -> {
+            try {
+                checkEligibilityAction();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
 
         bottomPanel.add(uploadButton);
         bottomPanel.add(checkButton);
@@ -150,14 +159,7 @@ public class GUI1 extends JFrame {
             }
 
             System.out.println(student.courses.size());
-            int semesterCount = DataHandler.countSemester(student.semesters);
-            System.out.println("Semester count: " + semesterCount);
-
-            if (semesterCount < 14) {
-                student.maxStudyDurationExceeded = false;
-            } else {
-                student.maxStudyDurationExceeded = true;
-            }
+            System.out.println("Semester count: " + student.semesterCount);
 
             // // for (Semester semester : student.semesters) {
             // // System.out.println(semester.semesterName + " " + semester.cgpa + " " +
@@ -175,12 +177,13 @@ public class GUI1 extends JFrame {
             nameLabel.setText("Student Name: " + student.name);
             nameLabel.setVisible(true);
 
+            System.out.println(" strrrrrr" + student);
             currentStudent = student;
 
         }
     }
 
-    private void checkEligibilityAction() {
+    private void checkEligibilityAction() throws Exception {
 
         if (currentStudent == null) {
             JOptionPane.showMessageDialog(this, "Please upload a transcript first.", "Error",
@@ -194,6 +197,14 @@ public class GUI1 extends JFrame {
                     JOptionPane.WARNING_MESSAGE);
             return; // Stop further processing if not eligible
         }
+        String rulesJson = loadRulesJson(); // Implement this to load rules JSON from a file or resource
+
+        // Initialize the rule interpreter with the loaded rules and eligibility checker
+        RuleInterpreter ruleInterpreter = new RuleInterpreter(rulesJson, eligibilityChecker);
+        String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
+
+        System.out.println("Rule results: ");
+        System.out.println(ruleResults);
 
         progressBar.setVisible(true);
         progressBar.setValue(0);
@@ -251,6 +262,14 @@ public class GUI1 extends JFrame {
 
         };
         worker.execute();
+    }
+
+    private String loadRulesJson() throws Exception {
+
+        String jsonText = new String(Files.readAllBytes(Paths
+                .get("C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\rules.json")));
+        return jsonText;
+
     }
 
     private boolean askPreEligibilityQuestions() {

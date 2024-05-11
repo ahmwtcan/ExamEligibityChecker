@@ -1,46 +1,189 @@
 [
     {
         "startNode": {
-            "id": "0",
+            "id": "2",
             "text": "Start"
         },
         "endNode": {
-            "id": "4",
-            "text": "Decision"
+            "id": "1",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
         },
         "type": true
     },
     {
         "startNode": {
-            "id": "4",
-            "text": "Decision"
+            "id": "1",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
         },
         "endNode": {
-            "id": "3",
-            "text": "Decision"
-        },
-        "type": true
-    },
-    {
-        "startNode": {
-            "id": "4",
-            "text": "Decision"
-        },
-        "endNode": {
-            "id": "2",
-            "text": "Condition"
+            "id": "5",
+            "text": "ILISIGI_KESILDI"
         },
         "type": false
     },
     {
         "startNode": {
-            "id": "2",
-            "text": "Condition"
+            "id": "1",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
         },
         "endNode": {
-            "id": "5",
-            "text": "CGPA Threshold: 0.0"
+            "id": "3",
+            "text": "XX400 dersini geçtim"
         },
         "type": true
+    },
+    {
+        "startNode": {
+            "id": "3",
+            "text": "XX400 dersini geçtim"
+        },
+        "endNode": {
+            "id": "6",
+            "text": "CGPA >= 2.7"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "3",
+            "text": "XX400 dersini geçtim"
+        },
+        "endNode": {
+            "id": "8",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "6",
+            "text": "CGPA >= 2.7"
+        },
+        "endNode": {
+            "id": "9",
+            "text": "BELIRLI_DONEM_SINAV_HAKKI"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "6",
+            "text": "CGPA >= 2.7"
+        },
+        "endNode": {
+            "id": "7",
+            "text": "Study Duration >= 7"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "7",
+            "text": "Study Duration >= 7"
+        },
+        "endNode": {
+            "id": "10",
+            "text": "MEZUN"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "7",
+            "text": "Study Duration >= 7"
+        },
+        "endNode": {
+            "id": "12",
+            "text": "WrL_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "12",
+            "text": "WrL_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "13",
+            "text": "FAILED_COUNT (1 <= 4) T.Course: Disabled"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "13",
+            "text": "FAILED_COUNT (1 <= 4) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "15",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "15",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "16",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "13",
+            "text": "FAILED_COUNT (1 <= 4) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "17",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "12",
+            "text": "WrL_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "18",
+            "text": "WrL_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "18",
+            "text": "WrL_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "19",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "18",
+            "text": "WrL_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "20",
+            "text": "ILISIGI_KESILDI"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "15",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "21",
+            "text": "DERSE_DEVAM"
+        },
+        "type": false
     }
 ]
