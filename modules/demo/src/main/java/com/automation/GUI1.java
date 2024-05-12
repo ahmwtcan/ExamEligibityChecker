@@ -19,10 +19,11 @@ public class GUI1 extends JFrame {
     private JProgressBar progressBar;
     private EligibilityChecker eligibilityChecker = new EligibilityChecker();
     private Student currentStudent;
-    private JPanel flagsPanel;
+    private JPanel examLogPanel;
     private String rulesJson;
     private String result;
     private String configuredLogs;
+    private JPanel configuredExamLogPanel;
 
     public GUI1() {
         initializeUI();
@@ -56,10 +57,9 @@ public class GUI1 extends JFrame {
         topPanel.add(greetingLabel);
 
         JLabel explanationLabel = new JLabel(
-                "<html><div style='width: 400px;'>" + // Set a preferred width for the label
-                        "<p>This application is in development state . "
+                "<html><div style='width: 400px;'>" +
+                        "<p>This application is in development state . For final decision please contact with deanery.</p>"
                         +
-                        "For final desicion please contact with deanery.</p>" +
                         "</div></html>");
         explanationLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         topPanel.add(explanationLabel);
@@ -75,7 +75,6 @@ public class GUI1 extends JFrame {
         c.insets = new Insets(10, 10, 10, 10);
 
         // Add components to the center panel...
-        // Remember to adjust GridBagConstraints for each component
         pdfNameLabel = new JLabel("Loaded: [none]");
         c.gridy = 0;
         centerPanel.add(pdfNameLabel, c);
@@ -87,24 +86,31 @@ public class GUI1 extends JFrame {
 
         statusLabel = new JLabel("Legacy Exam Status: ");
         statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        rulesStatusLabel = new JLabel("Configured Exam Status: ");
-        rulesStatusLabel.setFont(new Font("Arial", Font.BOLD, 14));
-
         c.gridy = 2;
         centerPanel.add(statusLabel, c);
+
+        rulesStatusLabel = new JLabel("Configured Exam Status: ");
+        rulesStatusLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        c.gridy = 3;
         centerPanel.add(rulesStatusLabel, c);
+
         progressBar = new JProgressBar(0, 100);
         progressBar.setVisible(false);
-        c.gridy = 3;
+        c.gridy = 4;
         centerPanel.add(progressBar, c);
 
         getContentPane().add(centerPanel, BorderLayout.CENTER);
 
+        // Add a new JPanel for Configured Exam Logs
+        configuredExamLogPanel = new JPanel(new GridLayout(8, 1));
+        configuredExamLogPanel.setBorder(BorderFactory.createTitledBorder("Configured Exam Logs"));
+        getContentPane().add(configuredExamLogPanel, BorderLayout.WEST);
+
         // Eligibility flags panel (East content)
-        flagsPanel = new JPanel(new GridLayout(8, 1)); // Assuming 8 different flags
-        flagsPanel.setBorder(BorderFactory.createTitledBorder("Eligibility Logs"));
+        examLogPanel = new JPanel(new GridLayout(8, 1)); // Assuming 8 different flags
+        examLogPanel.setBorder(BorderFactory.createTitledBorder("Eligibility Logs"));
         addFlagsToPanel(); // Initialize with pending labels
-        getContentPane().add(flagsPanel, BorderLayout.EAST);
+        getContentPane().add(examLogPanel, BorderLayout.EAST);
 
         // South content (buttons)
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -172,12 +178,15 @@ public class GUI1 extends JFrame {
 
         // clear previous data
         nameLabel.setVisible(false);
-        flagsPanel.removeAll();
-        statusLabel.setText("Exam Status: ");
+        examLogPanel.removeAll();
+        statusLabel.setText("Legacy Exam Status: ");
         addFlagsToPanel();
-        flagsPanel.revalidate();
-        flagsPanel.repaint();
+        examLogPanel.revalidate();
+        examLogPanel.repaint();
         rulesStatusLabel.setText("Configured Exam Status: ");
+        configuredExamLogPanel.removeAll();
+        configuredExamLogPanel.revalidate();
+        configuredExamLogPanel.repaint();
 
         int returnValue = fileChooser.showOpenDialog(GUI1.this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -302,9 +311,9 @@ public class GUI1 extends JFrame {
             protected void done() {
                 try {
                     EligibilityProcess process = get(); // Get the eligibility result
-                    updateFlagsPanel(process); // Update the flags panel based on the process results
+                    updateexamLogPanel(process); // Update the flags panel based on the process results
 
-                    statusLabel.setText("Exam Status: " + (process.examRight));
+                    statusLabel.setText("Legacy Exam Status: " + (process.examRight));
                     rulesStatusLabel.setText("Configured Exam Status: " + result);
 
                 } catch (Exception e) {
@@ -377,29 +386,37 @@ public class GUI1 extends JFrame {
         return 1;
     }
 
-    private void updateFlagsPanel(EligibilityProcess process) {
+    private void updateexamLogPanel(EligibilityProcess process) {
         // Clear existing flags
-        flagsPanel.removeAll();
+        examLogPanel.removeAll();
 
         String[] messages = process.message.split("\n");
         for (String message : messages) {
-            flagsPanel.add(new JLabel(message));
+            examLogPanel.add(new JLabel(message));
+        }
+
+        String[] configuredMessages = configuredLogs.split("\n");
+        for (String message : configuredMessages) {
+            configuredExamLogPanel.add(new JLabel(message));
         }
 
         // Ensure the panel updates to display the new components
-        flagsPanel.revalidate();
-        flagsPanel.repaint();
+        examLogPanel.revalidate();
+        examLogPanel.repaint();
+
+        configuredExamLogPanel.revalidate();
+        configuredExamLogPanel.repaint();
     }
 
     private void addFlagsToPanel() {
-        flagsPanel.add(new JLabel("Withdrawals and Leaves: Pending"));
-        flagsPanel.add(new JLabel("Internship: Pending"));
-        flagsPanel.add(new JLabel("All Courses Taken: Pending"));
-        flagsPanel.add(new JLabel("Table Course: Pending"));
-        flagsPanel.add(new JLabel("GPA: Pending"));
-        flagsPanel.add(new JLabel("Max Study Duration: Pending"));
-        flagsPanel.add(new JLabel("FF Grades: Pending"));
-        flagsPanel.add(new JLabel("Grade Improvement: Pending")).setVisible(false);
+        examLogPanel.add(new JLabel("Withdrawals and Leaves: Pending"));
+        examLogPanel.add(new JLabel("Internship: Pending"));
+        examLogPanel.add(new JLabel("All Courses Taken: Pending"));
+        examLogPanel.add(new JLabel("Table Course: Pending"));
+        examLogPanel.add(new JLabel("GPA: Pending"));
+        examLogPanel.add(new JLabel("Max Study Duration: Pending"));
+        examLogPanel.add(new JLabel("FF Grades: Pending"));
+        examLogPanel.add(new JLabel("Grade Improvement: Pending")).setVisible(false);
 
     }
 

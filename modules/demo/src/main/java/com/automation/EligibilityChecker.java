@@ -159,7 +159,6 @@ public class EligibilityChecker {
             return process;
         } else {
             process.GPAFlag = false;
-            System.out.println("Student's GPA is above 2.0");
             process.examRight = ExamRight.HAK_YOK;
             return process;
         }

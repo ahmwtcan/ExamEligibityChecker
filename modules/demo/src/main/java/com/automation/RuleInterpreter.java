@@ -118,6 +118,8 @@ public class RuleInterpreter {
 
     private static boolean evaluateCondition(JSONObject startNode, Student student2, EligibilityChecker checker2) {
         String text = startNode.getString("text");
+        Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
+
         if (text.startsWith("CGPA >=")) {
             double requiredGPA = Double.parseDouble(text.substring(8).trim());
             return checker2.checkGPA(student2, requiredGPA);
@@ -149,8 +151,7 @@ public class RuleInterpreter {
             int maxAllowed = Integer.parseInt(parts[1].trim());
             int minAllowed = Integer.parseInt(parts[0].trim());
             return checker2.checkFailedCourses(student2, maxAllowed, minAllowed);
-        } else if (text.contains("not yükseltirsem")) {
-            Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
+        } else if (text.contains("not yükseltirsem") && gpaMatcher.find()) {
             if (gpaMatcher.find()) {
                 double requiredGPA = Double.parseDouble(gpaMatcher.group(1));
                 return checker2.canGradeImprovementRaiseCGPA(student2, requiredGPA);
