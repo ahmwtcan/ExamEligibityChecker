@@ -118,8 +118,6 @@ public class RuleInterpreter {
 
     private static boolean evaluateCondition(JSONObject startNode, Student student2, EligibilityChecker checker2) {
         String text = startNode.getString("text");
-        Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
-
         if (text.startsWith("CGPA >=")) {
             double requiredGPA = Double.parseDouble(text.substring(8).trim());
             return checker2.checkGPA(student2, requiredGPA);
@@ -151,11 +149,20 @@ public class RuleInterpreter {
             int maxAllowed = Integer.parseInt(parts[1].trim());
             int minAllowed = Integer.parseInt(parts[0].trim());
             return checker2.checkFailedCourses(student2, maxAllowed, minAllowed);
-        } else if (text.contains("not yükseltirsem") && gpaMatcher.find()) {
+        } else if (text.contains("not yükseltirsem") || text.matches(".*\\d+\\.\\d{2}\\+.*")) {
+            Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
             if (gpaMatcher.find()) {
                 double requiredGPA = Double.parseDouble(gpaMatcher.group(1));
                 return checker2.canGradeImprovementRaiseCGPA(student2, requiredGPA);
             }
+        } else if (text.matches(".*(bütün dersleri).*")
+                && (text.matches(".*(başarılı|başarısız).*") || text.matches(".*(hepsinin).*"))) {
+            return checker2.isAllCoursesTaken(student2);
+        } else if (text.matches(".*(hakkımı|kullandım).*")) {
+            return checker2.gotExamRightAndUsed(student2);
+        } else if (text.matches(
+                ".*(hakkımda).*(ek\\s*sınav|ek_sınav|ek\\s*sınavları|ek\\s*imtihan|derse\\s*bir\\s*defa\\s*devam).*((kararı\\s*alınmıştı)|(kararı\\s*alındı)).*")) {
+            return checker2.gotExamRight(student2);
         }
 
         // Default condition if text is not recognized
@@ -177,7 +184,6 @@ public class RuleInterpreter {
             int maxFFAllowed = Integer.parseInt(parts[1].trim());
             int minFFAllowed = Integer.parseInt(parts[0].trim());
             boolean tableCourseEnabled = text.contains("T.Course: Enabled");
-
             if (tableCourseEnabled)
                 return "checker.checkFFgrades(student, " + maxFFAllowed + ", " + minFFAllowed + ", true)";
             else
@@ -195,7 +201,22 @@ public class RuleInterpreter {
             int maxAllowed = Integer.parseInt(parts[1].trim());
             int minAllowed = Integer.parseInt(parts[0].trim());
             return "checker.checkFailedCourses(student, " + maxAllowed + ", " + minAllowed + ")";
+        } else if (text.contains("not yükseltirsem") || text.matches(".*\\d+\\.\\d{2}\\+.*")) {
+            Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
+            if (gpaMatcher.find()) {
+                double requiredGPA = Double.parseDouble(gpaMatcher.group(1));
+                return "checker.canGradeImprovementRaiseCGPA(student, " + requiredGPA + ")";
+            }
+        } else if (text.matches(".*(bütün dersleri).*")
+                && (text.matches(".*(başarılı|başarısız).*") || text.matches(".*(hepsinin).*"))) {
+            return "checker.isAllCoursesTaken(student)";
+        } else if (text.matches(".*(hakkımı|kullandım).*")) {
+            return "checker.gotExamRightAndUsed(student)";
+        } else if (text.matches(
+                ".*(hakkımda).*(ek\\s*sınav|ek_sınav|ek\\s*sınavları|ek\\s*imtihan|derse\\s*bir\\s*defa\\s*devam).*((kararı\\s*alınmıştı)|(kararı\\s*alındı)).*")) {
+            return "checker.gotExamRight(student)";
         }
+
         // Default condition if text is not recognized
         return "true";
     }

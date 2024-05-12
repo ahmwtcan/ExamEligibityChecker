@@ -1,0 +1,409 @@
+[
+    {
+        "startNode": {
+            "id": "0",
+            "text": "Start"
+        },
+        "endNode": {
+            "id": "1",
+            "text": "Study Duration >= 15"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "1",
+            "text": "Study Duration >= 15"
+        },
+        "endNode": {
+            "id": "2",
+            "text": "WrL_COUNT (0 <= 10) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "2",
+            "text": "WrL_COUNT (0 <= 10) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "3",
+            "text": "HAK_YOK"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "2",
+            "text": "WrL_COUNT (0 <= 10) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "4",
+            "text": "zorunlu stajımı tamamladım XX400 dersine kayıt oldum ve \"P\" notu ile geçtım "
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "4",
+            "text": "zorunlu stajımı tamamladım XX400 dersine kayıt oldum ve \"P\" notu ile geçtım "
+        },
+        "endNode": {
+            "id": "5",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "4",
+            "text": "zorunlu stajımı tamamladım XX400 dersine kayıt oldum ve \"P\" notu ile geçtım "
+        },
+        "endNode": {
+            "id": "6",
+            "text": "Programımdaki bütün dersleri en az bir kere aldım ve (başarılı/başarısız) hepsinin notu not çizelgemde gözüküyor"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "6",
+            "text": "Programımdaki bütün dersleri en az bir kere aldım ve (başarılı/başarısız) hepsinin notu not çizelgemde gözüküyor"
+        },
+        "endNode": {
+            "id": "7",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "6",
+            "text": "Programımdaki bütün dersleri en az bir kere aldım ve (başarılı/başarısız) hepsinin notu not çizelgemde gözüküyor"
+        },
+        "endNode": {
+            "id": "8",
+            "text": "Study Duration >= 8"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "8",
+            "text": "Study Duration >= 8"
+        },
+        "endNode": {
+            "id": "9",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "8",
+            "text": "Study Duration >= 8"
+        },
+        "endNode": {
+            "id": "10",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "10",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "11",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "10",
+            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "12",
+            "text": "FF_COUNT (0 <= 1) T.Course: Enabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "12",
+            "text": "FF_COUNT (0 <= 1) T.Course: Enabled"
+        },
+        "endNode": {
+            "id": "13",
+            "text": "HAK_YOK"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "12",
+            "text": "FF_COUNT (0 <= 1) T.Course: Enabled"
+        },
+        "endNode": {
+            "id": "14",
+            "text": "FF_COUNT (1 <= 22) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "14",
+            "text": "FF_COUNT (1 <= 22) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "15",
+            "text": "HAK_YOK"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "14",
+            "text": "FF_COUNT (1 <= 22) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "17",
+            "text": "CGPA >= 2.0"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "17",
+            "text": "CGPA >= 2.0"
+        },
+        "endNode": {
+            "id": "16",
+            "text": "Bir dersten not yükseltirsem not ortalalmam 2.50+ olacak"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "17",
+            "text": "CGPA >= 2.0"
+        },
+        "endNode": {
+            "id": "18",
+            "text": "MEZUN"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "16",
+            "text": "Bir dersten not yükseltirsem not ortalalmam 2.50+ olacak"
+        },
+        "endNode": {
+            "id": "19",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "16",
+            "text": "Bir dersten not yükseltirsem not ortalalmam 2.50+ olacak"
+        },
+        "endNode": {
+            "id": "20",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "1",
+            "text": "Study Duration >= 15"
+        },
+        "endNode": {
+            "id": "21",
+            "text": "WrL_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "21",
+            "text": "WrL_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "22",
+            "text": "ILISIGI_KESILDI"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "21",
+            "text": "WrL_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "23",
+            "text": "Daha önce hakkımda ek sınav hakkı kararı alınmıştı"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "23",
+            "text": "Daha önce hakkımda ek sınav hakkı kararı alınmıştı"
+        },
+        "endNode": {
+            "id": "24",
+            "text": "İki ek sınav hakkımı tüm başarısız dersler için kullandım"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "24",
+            "text": "İki ek sınav hakkımı tüm başarısız dersler için kullandım"
+        },
+        "endNode": {
+            "id": "25",
+            "text": "FF_COUNT (0 <= 5) T.Course: Disabled"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "23",
+            "text": "Daha önce hakkımda ek sınav hakkı kararı alınmıştı"
+        },
+        "endNode": {
+            "id": "26",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "25",
+            "text": "FF_COUNT (0 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "26",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "24",
+            "text": "İki ek sınav hakkımı tüm başarısız dersler için kullandım"
+        },
+        "endNode": {
+            "id": "27",
+            "text": "HAK_YOK"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "25",
+            "text": "FF_COUNT (0 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "28",
+            "text": "ILISIGI_KESILDI"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "26",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "29",
+            "text": "SINIRSIZ_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "26",
+            "text": "FAILED_COUNT (0 <= 1) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "30",
+            "text": "FAILED_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "30",
+            "text": "FAILED_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "31",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "30",
+            "text": "FAILED_COUNT (1 <= 5) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "33",
+            "text": "FF_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "33",
+            "text": "FF_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "34",
+            "text": "EK_SINAV"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "33",
+            "text": "FF_COUNT (5 <= 15) T.Course: Disabled"
+        },
+        "endNode": {
+            "id": "35",
+            "text": "CGPA >= 2.0"
+        },
+        "type": false
+    },
+    {
+        "startNode": {
+            "id": "35",
+            "text": "CGPA >= 2.0"
+        },
+        "endNode": {
+            "id": "36",
+            "text": "MEZUN"
+        },
+        "type": true
+    },
+    {
+        "startNode": {
+            "id": "35",
+            "text": "CGPA >= 2.0"
+        },
+        "endNode": {
+            "id": "37",
+            "text": "SINIRSIZ_SINAV"
+        },
+        "type": false
+    }
+]

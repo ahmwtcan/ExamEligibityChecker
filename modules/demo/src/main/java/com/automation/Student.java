@@ -12,6 +12,7 @@ public class Student {
     public boolean maxStudyDurationExceeded;
     public boolean isAllCoursesTaken;
     public boolean gotExamRightAndUsed;
+    public boolean gotExamRight;
     public int semesterCount;
     public int totalCredits;
 
@@ -20,10 +21,10 @@ public class Student {
     Student(String name, String studentNumber,
             int completedCredits, Double cgpa, List<Semester> semesters, List<Course> courses,
             boolean maxStudyDurationExceeded, boolean isAllCoursesTaken, boolean gotExamRightAndUsed,
+            boolean gotExamRight,
             int semesterCount, int totalCredits) {
         this.name = name;
         this.studentNumber = studentNumber;
-
         this.completedCredits = completedCredits;
         this.cgpa = cgpa;
         this.semesters = semesters;
@@ -31,6 +32,7 @@ public class Student {
         this.maxStudyDurationExceeded = maxStudyDurationExceeded;
         this.isAllCoursesTaken = isAllCoursesTaken;
         this.gotExamRightAndUsed = gotExamRightAndUsed;
+        this.gotExamRight = gotExamRight;
         this.semesterCount = semesterCount;
         this.totalCredits = totalCredits;
     }
@@ -45,6 +47,7 @@ public class Student {
                 ", maxStudyDurationExceeded=" + maxStudyDurationExceeded +
                 ", isAllCoursesTaken=" + isAllCoursesTaken +
                 ", gotExamRightAndUsed=" + gotExamRightAndUsed +
+                ", gotExamRight=" + gotExamRight +
                 ", semesterCount=" + semesterCount +
                 ", totalCredits=" + totalCredits +
                 '}';

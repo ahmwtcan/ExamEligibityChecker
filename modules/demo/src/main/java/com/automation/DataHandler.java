@@ -25,7 +25,6 @@ public class DataHandler {
                 Pattern.DOTALL);
 
         Matcher simpleMatcher = simplePattern.matcher(transcript);
-        System.out.println("Simple Matcher: " + simpleMatcher);
 
         if (simpleMatcher.find()) {
             String name = simpleMatcher.group(1).trim();
@@ -60,9 +59,8 @@ public class DataHandler {
                 completedCredits += semester.completedCredits;
             }
 
-            System.out.println(" " + semesters);
-
             return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true,
+                    false,
                     false, countSemester(semesters), Integer.parseInt(totalCredits));
 
         } else {

@@ -32,13 +32,32 @@ public class EligibilityChecker {
         if (student.maxStudyDurationExceeded) {
             System.out.println("Student has exceeded the maximum study duration");
 
-            if (!hasFailedTableCourseWithoutRetake(student) || !checkWorLgrades(student, maxWLCount, minWLCount)) {
+            if (!hasFailedTableCourseWithoutRetake(student)
+                    && !checkWorLgrades(student, maxWLCount = 15, minWLCount = 6)) {
                 process.tableCourseFlag = true;
                 process.examRight = ExamRight.ILISIGI_KESILDI;
                 return process;
             }
             long ffCount = countFFgrades(student);
-            System.out.println("Student has " + ffCount + " FF grades");
+
+            if (student.gotExamRight) {
+                if (!student.gotExamRightAndUsed) {
+                    process.examRight = ExamRight.HAK_YOK;
+                    process.message += "Student has exceeded the maximum study duration and has not used exam right"
+                            + "\n";
+                    return process;
+                } else if (process.gotExamRightAndUsed) {
+
+                    if (ffCount > maxFFCount) {
+                        process.examRight = ExamRight.ILISIGI_KESILDI;
+                        process.message += "Student has exceeded the maximum study duration and has more than 5 FF grades"
+                                + "\n";
+                        return process;
+                    }
+
+                }
+            }
+
             if (ffCount > 5) {
 
                 if (process.gotExamRightAndUsed) {
@@ -82,7 +101,7 @@ public class EligibilityChecker {
         // courses, return false
         if (!checkWithdrawalsAndLeaves(student)) {
             process.WorLflag = true;
-            process.examRight = ExamRight.ILISIGI_KESILDI;
+            process.examRight = ExamRight.HAK_YOK;
             process.message += "Student has a W or L grade without passing subsequently in any course" + "\n";
             return process;
 
@@ -113,10 +132,15 @@ public class EligibilityChecker {
             System.out.println("Student has taken all courses");
             process.message += "Student has taken all courses" + "\n";
         }
+
+        if (student.semesterCount < 9) {
+            process.examRight = ExamRight.HAK_YOK;
+            process.message += "Student has not completed normal study duration " + "\n";
+            return process;
+        }
+
         // 5. Step
         long FirstffCount = countFFgrades(student);
-
-        System.out.println("Student has " + FirstffCount + " FF grades");
 
         if (FirstffCount == 1) {
             Boolean flag = hasFailedTableCourseWithoutRetake(student);
@@ -130,7 +154,7 @@ public class EligibilityChecker {
             System.out.println("Student has only 1 FF grade");
             process.FFgradeFlag = false;
             process.examRight = ExamRight.EK_SINAV;
-            process.message += "Student has only 1 FF grade" + "\n";
+            process.message += "Student has only 1 FF grade and have exam right" + "\n";
             return process;
         } else if (FirstffCount > 1) {
             System.out.println("Student has more than 1 FF grade");
@@ -154,6 +178,7 @@ public class EligibilityChecker {
                 System.out.println("Student can improve a grade to raise CGPA above 2.0");
                 process.gradeImprovementFlag = true;
                 process.examRight = ExamRight.EK_SINAV;
+                return process;
             }
             process.examRight = ExamRight.HAK_YOK;
             return process;
@@ -196,12 +221,12 @@ public class EligibilityChecker {
     boolean checkMaxStudyDuration(Student student, int threshold) {
 
         if (student.semesterCount >= threshold) {
-            System.out.println("treshold " + (threshold));
             student.maxStudyDurationExceeded = true;
-            process.message += "Student has exceeded the  study duration threshold " + threshold + "\n";
+            process.message += "Student has exceeded the study duration threshold " + threshold + "\n";
             return true;
         }
         student.maxStudyDurationExceeded = false;
+        process.message += "Student has not exceeded the study duration threshold " + threshold + "\n";
         return false;
 
     }
@@ -235,7 +260,50 @@ public class EligibilityChecker {
                 return true;
             }
         }
+        process.message += "Student has not taken the internship course" + "\n";
         return false;
+    }
+
+    public boolean isAllCoursesTaken(Student student) {
+
+        if (!student.isAllCoursesTaken) {
+            System.out.println("Student has not taken all courses");
+            process.message += "Student has not taken all courses" + "\n";
+            return false;
+        } else {
+            System.out.println("Student has taken all courses");
+            process.message += "Student has taken all courses" + "\n";
+        }
+
+        return student.isAllCoursesTaken;
+    }
+
+    public boolean gotExamRightAndUsed(Student student) {
+
+        if (student.gotExamRightAndUsed) {
+            System.out.println("Student has exam right and used it");
+            process.message += "Student has exam right and used it" + "\n";
+            return student.gotExamRightAndUsed;
+        } else {
+            System.out.println("Student has exam right but did not use it");
+            process.message += "Student has exam right but did not use it" + "\n";
+        }
+
+        return student.gotExamRightAndUsed;
+    }
+
+    public boolean gotExamRight(Student student) {
+
+        if (student.gotExamRight) {
+            System.out.println("Student got exam right before");
+            process.message += "Student got exam right before" + "\n";
+            return student.gotExamRight;
+        } else {
+            System.out.println("Student does not have exam right before");
+            process.message += "Student does not have exam right before" + "\n";
+        }
+
+        return student.gotExamRight;
     }
 
     // if student has a FF grade in any table course, return false
@@ -301,7 +369,7 @@ public class EligibilityChecker {
         process.message += "Student has " + failingGradesCount + " courses with FF or FA grades" + "\n";
 
         // Check if the count of failing grades is within the specified range
-        return (failingGradesCount >= minFFCount && failingGradesCount < maxFFCount);
+        return (failingGradesCount > minFFCount && failingGradesCount <= maxFFCount);
     }
 
     public long countFFgrades(Student student) {
@@ -346,7 +414,7 @@ public class EligibilityChecker {
 
         process.message += "Student has " + wlCount + " courses with only unresolved W or L grades " + "\n";
 
-        return wlCount >= minWLCount && wlCount < maxWLCount;
+        return wlCount > minWLCount && wlCount <= maxWLCount;
     }
 
     private static boolean hasSubsequentPassingGrade(List<String> grades) {
@@ -381,7 +449,7 @@ public class EligibilityChecker {
 
         process.message += "Student has " + failedCourses + " failed courses " + "\n";
 
-        return failedCourses >= min && failedCourses <= max;
+        return failedCourses > min && failedCourses <= max;
     }
 
     private boolean isHigherGrade(String newGrade, String oldGrade) {
@@ -441,17 +509,17 @@ public class EligibilityChecker {
             totalGradePoints += getGradePoints(course.grade) * course.credits;
         }
 
-        System.out.println("Total credits: " + totalCredits);
-        System.out.println("Total grade points: " + totalGradePoints);
-
         if (student.totalCredits <= totalCredits) {
             totalCredits = student.totalCredits;
         }
 
-        System.out.println("Total grade points    asasdasd: " + totalCredits);
-
         double currentCGPA = totalCredits > 0 ? totalGradePoints / totalCredits : 0.0;
-        System.out.println("Calculated CGPA: " + df.format(currentCGPA));
+
+        if (student.cgpa < currentCGPA) {
+            currentCGPA = student.cgpa;
+        }
+
+        System.out.println("Current CGPA: " + df.format(currentCGPA));
 
         if (currentCGPA >= requiredCGPA) {
             System.out.println("Current CGPA meets or exceeds the required CGPA.");
@@ -477,10 +545,15 @@ public class EligibilityChecker {
                 double newTotalGradePoints = totalGradePoints - originalGradePoints + nextGradePoints;
                 double newCGPA = newTotalGradePoints / totalCredits;
 
-                System.out.println("Checking improvement for course " + bestAttempt.code + ": " + currentGrade + " to "
+                // System.out.println("Checking improvement for course " + bestAttempt.code + ":
+                // " + fistGrade + " to "
+                // + nextGrade + " raises CGPA from " + df.format(currentCGPA) + " to " +
+                // df.format(newCGPA));
+
+                System.out.println("Checking improvement for course " + bestAttempt.code + ": " + fistGrade + " to "
                         + nextGrade + " raises CGPA from " + df.format(currentCGPA) + " to " + df.format(newCGPA));
 
-                if (newCGPA >= requiredCGPA) {
+                if ((Math.round(newCGPA * 100) / 100.0) >= requiredCGPA) {
                     System.out.println("Improvement found that raises CGPA above required level.");
 
                     process.message += "Improvement found on course " + bestAttempt.code + ": " + fistGrade + " to "
