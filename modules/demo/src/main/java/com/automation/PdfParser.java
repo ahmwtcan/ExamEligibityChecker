@@ -63,7 +63,7 @@ public class PdfParser {
     }
 
     static class TableCourse {
-        private String code;
+        String code;
         private String name;
 
         public TableCourse(String code, String name) {

@@ -13,13 +13,14 @@ public class Student {
     public boolean isAllCoursesTaken;
     public boolean gotExamRightAndUsed;
     public int semesterCount;
+    public int totalCredits;
 
     // Gerekli getter ve setter metodları
 
     Student(String name, String studentNumber,
             int completedCredits, Double cgpa, List<Semester> semesters, List<Course> courses,
             boolean maxStudyDurationExceeded, boolean isAllCoursesTaken, boolean gotExamRightAndUsed,
-            int semesterCount) {
+            int semesterCount, int totalCredits) {
         this.name = name;
         this.studentNumber = studentNumber;
 
@@ -31,6 +32,7 @@ public class Student {
         this.isAllCoursesTaken = isAllCoursesTaken;
         this.gotExamRightAndUsed = gotExamRightAndUsed;
         this.semesterCount = semesterCount;
+        this.totalCredits = totalCredits;
     }
 
     @Override
@@ -44,6 +46,7 @@ public class Student {
                 ", isAllCoursesTaken=" + isAllCoursesTaken +
                 ", gotExamRightAndUsed=" + gotExamRightAndUsed +
                 ", semesterCount=" + semesterCount +
+                ", totalCredits=" + totalCredits +
                 '}';
     }
 

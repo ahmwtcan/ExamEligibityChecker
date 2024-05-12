@@ -6,14 +6,14 @@
         },
         "endNode": {
             "id": "1",
-            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+            "text": "FF_COUNT (0 <= 12) T.Course: Disabled"
         },
         "type": true
     },
     {
         "startNode": {
             "id": "1",
-            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+            "text": "FF_COUNT (0 <= 12) T.Course: Disabled"
         },
         "endNode": {
             "id": "5",
@@ -24,18 +24,18 @@
     {
         "startNode": {
             "id": "1",
-            "text": "FF_COUNT (0 <= 1) T.Course: Disabled"
+            "text": "FF_COUNT (0 <= 12) T.Course: Disabled"
         },
         "endNode": {
             "id": "3",
-            "text": "XX400 dersini geçtim"
+            "text": "Bir dersten not yükseltirsem not ortalamam 2.75+ veya üstü olacak"
         },
         "type": true
     },
     {
         "startNode": {
             "id": "3",
-            "text": "XX400 dersini geçtim"
+            "text": "Bir dersten not yükseltirsem not ortalamam 2.75+ veya üstü olacak"
         },
         "endNode": {
             "id": "6",
@@ -46,7 +46,7 @@
     {
         "startNode": {
             "id": "3",
-            "text": "XX400 dersini geçtim"
+            "text": "Bir dersten not yükseltirsem not ortalamam 2.75+ veya üstü olacak"
         },
         "endNode": {
             "id": "8",

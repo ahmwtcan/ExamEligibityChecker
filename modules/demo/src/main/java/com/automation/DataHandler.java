@@ -6,6 +6,7 @@ import java.util.regex.*;
 public class DataHandler {
 
     private static final Pattern SEMESTER_PATTERN = Pattern.compile("20\\d{2} (FALL|SPRING|SUMMER)");
+
     private static final Pattern COURSE_PATTERN = Pattern.compile(
             "([A-Z]+\\s\\d{3})\\s+([^0-9]+?)\\s+(\\d+)\\s/\\s(\\d+)\\s([A-Z]{1,2}(?:\\([A-Z]{1,2}\\))?)\\s*(\\(R\\))?\\s(\\d+\\.\\d{2})");
 
@@ -19,18 +20,32 @@ public class DataHandler {
     public static Student getStudent(String transcript) {
 
         Pattern simplePattern = Pattern.compile(
-                "Name,\\s*Surname\\s*:\\s*(.+?)\\r?\n" +
-                        "Student\\s*Number\\s*:\\s*(\\d+)",
-                Pattern.DOTALL); // Use DOTALL to capture across lines
+                "(?s)Name,\\s*Surname\\s*:\\s*(.+?)\\s*" +
+                        "Student\\s*Number\\s*:\\s*(\\d+)\\s*",
+                Pattern.DOTALL);
 
         Matcher simpleMatcher = simplePattern.matcher(transcript);
+        System.out.println("Simple Matcher: " + simpleMatcher);
+
         if (simpleMatcher.find()) {
             String name = simpleMatcher.group(1).trim();
             String studentNumber = simpleMatcher.group(2).trim();
 
+            Pattern totalCreditsPattern = Pattern
+                    .compile("Completed\\/Total\\s*Credits\\s*(?:\\b|\\s)?(\\d+)\\s*(?:\\/|\\s)?(\\d+)\\s*");
+
+            Matcher totalCreditsMatcher = totalCreditsPattern.matcher(transcript);
+            String cCredits = "";
+            String totalCredits = "";
+            if (totalCreditsMatcher.find()) {
+                cCredits = totalCreditsMatcher.group(1);
+                totalCredits = totalCreditsMatcher.group(2);
+            }
+
             System.out.println("Name: " + name);
             System.out.println("Student Number: " + studentNumber);
-
+            System.out.println("Completed Credits: " + cCredits);
+            System.out.println("Total Credits: " + totalCredits);
             List<Semester> semesters = parseTranscript(transcript);
 
             List<Course> courses = new ArrayList<>();
@@ -45,8 +60,10 @@ public class DataHandler {
                 completedCredits += semester.completedCredits;
             }
 
+            System.out.println(" " + semesters);
+
             return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true,
-                    false, countSemester(semesters));
+                    false, countSemester(semesters), Integer.parseInt(totalCredits));
 
         } else {
             System.out.println("Failed to match extended info. Check regex and transcript format.");
@@ -108,16 +125,15 @@ public class DataHandler {
         Matcher courseMatcher = COURSE_PATTERN.matcher(section);
 
         while (courseMatcher.find()) {
-            Course course = new Course(
-                    courseMatcher.group(1), // code
-                    courseMatcher.group(2), // name
-                    Integer.parseInt(courseMatcher.group(3)), // credits
-                    courseMatcher.group(5).trim()
-                            + (courseMatcher.group(6) != null ? courseMatcher.group(6).trim() : "") // grade
-            );
-            courses.add(course);
-        }
+            String code = courseMatcher.group(1);
+            String name = courseMatcher.group(2).trim();
+            int credits = Integer.parseInt(courseMatcher.group(3));
+            String grade = courseMatcher.group(5).trim()
+                    + (courseMatcher.group(6) != null ? courseMatcher.group(6) : "");
+            double totalCredits = Double.parseDouble(courseMatcher.group(7)); // Ensure this captures the correct value
 
+            courses.add(new Course(code, name, credits, grade, totalCredits));
+        }
         return courses;
     }
 

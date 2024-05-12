@@ -6,7 +6,11 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RuleInterpreter {
     private static Student student;
@@ -20,36 +24,74 @@ public class RuleInterpreter {
 
     private static Map<String, JSONObject> buildNodeMap(JSONArray rules) {
         Map<String, JSONObject> nodeMap = new HashMap<>();
+        Set<String> startNodeIds = new HashSet<>();
         for (int i = 0; i < rules.length(); i++) {
             JSONObject rule = rules.getJSONObject(i);
             JSONObject startNode = rule.getJSONObject("startNode");
             JSONObject endNode = rule.getJSONObject("endNode");
-            nodeMap.put(startNode.getString("id"),
-                    new JSONObject().put("startNode", startNode).put("endNode", endNode));
+
+            // Add startNode to map
+            nodeMap.put(startNode.getString("id"), new JSONObject()
+                    .put("startNode", startNode)
+                    .put("endNode", endNode));
+            startNodeIds.add(startNode.getString("id"));
+
+            // Check if the endNode is also a startNode
+            if (!startNodeIds.contains(endNode.getString("id"))) {
+                // Add endNode as a terminal node if it's not a startNode elsewhere
+                nodeMap.putIfAbsent(endNode.getString("id"), new JSONObject()
+                        .put("startNode", endNode));
+            }
         }
         return nodeMap;
     }
 
+    private static String generateIfElse(StringBuilder result, String nodeId, Map<String, JSONObject> nodeMap,
+            Map<String, JSONObject> connectionsMap, String indent, Student student) {
+        JSONObject currentNode = nodeMap.get(nodeId);
+        if (currentNode == null) {
+            // New addition: Check if nodeId is a terminal node from connectionsMap and
+            // return its text
+            JSONObject terminalNode = connectionsMap.get(nodeId);
+            if (terminalNode != null) {
+                result.append(indent).append("Terminal node reached: ").append(terminalNode.getString("text"))
+                        .append(".\n");
+                return terminalNode.getString("text");
+            } else {
+                result.append(indent).append("No more nodes to evaluate or invalid node ID: ").append(nodeId)
+                        .append(".\n");
+                return "Invalid node ID: " + nodeId; // Graceful error handling
+            }
+        }
+
+        JSONObject startNode = currentNode.getJSONObject("startNode");
+        boolean condition = evaluateCondition(startNode, student, checker);
+
+        result.append(indent).append("Evaluating: ").append(startNode.getString("text")).append(" -> ")
+                .append(condition ? "True" : "False").append("\n");
+
+        JSONObject nextNode = condition ? connectionsMap.get(startNode.getString("id") + true)
+                : connectionsMap.get(startNode.getString("id") + false);
+
+        if (nextNode != null) {
+            String nextNodeId = nextNode.getString("id");
+            result.append(indent).append(condition ? "True branch: " : "False branch: ")
+                    .append(nextNode.getString("text")).append("\n");
+            return generateIfElse(result, nextNodeId, nodeMap, connectionsMap, indent + "    ", student);
+        } else {
+            result.append(indent).append("End of path reached at node ID: ").append(nodeId).append("\n");
+            return startNode.getString("text"); // Return the text of the final node if no further nodes are found.
+        }
+    }
+
     public String evaluateRules(Student student) {
         Map<String, JSONObject> nodeMap = buildNodeMap(this.rules);
-
         Map<String, JSONObject> connectionsMap = buildConnectionsMap(this.rules);
-
-        System.out.println("Node Map: " + nodeMap);
-
         String startNodeId = findStartNodeId(nodeMap);
         StringBuilder result = new StringBuilder();
-        String finalNodeId = generateIfElse(result, startNodeId, nodeMap, connectionsMap, "", student);
-        result.append("Final Decision Node ID: ").append(finalNodeId).append("\n");
+        String finalNodeText = generateIfElse(result, startNodeId, nodeMap, connectionsMap, "", student);
+        result.append("Final Decision Node Text: ").append(finalNodeText).append("\n");
 
-        JSONObject finalNode = connectionsMap.get(finalNodeId + "true");
-        System.out.println("Final Node: " + finalNode);
-        if (finalNode != null && finalNode.has("endNode")) {
-            String finalDecision = finalNode.getJSONObject("endNode").getString("text");
-            result.append("Final Decision: ").append(finalDecision).append("\n");
-        } else {
-            result.append("Error: Final node or decision not properly configured.\n");
-        }
         return result.toString();
     }
 
@@ -74,35 +116,6 @@ public class RuleInterpreter {
         return connectionsMap;
     }
 
-    private static String generateIfElse(StringBuilder result, String nodeId, Map<String, JSONObject> nodeMap,
-            Map<String, JSONObject> connectionsMap, String indent, Student student) {
-        JSONObject currentNode = nodeMap.get(nodeId);
-        if (currentNode == null) {
-            result.append(indent).append("No more nodes to evaluate. Node ID: ").append(nodeId)
-                    .append(" is terminal.\n");
-            return nodeId; // Return the current node ID as the final node if no further nodes are found.
-        }
-
-        JSONObject startNode = currentNode.getJSONObject("startNode");
-        boolean condition = evaluateCondition(startNode, student, checker);
-
-        result.append(indent).append("Evaluating: ").append(startNode.getString("text")).append(" -> ")
-                .append(condition ? "True" : "False").append("\n");
-
-        JSONObject nextNode = condition ? connectionsMap.get(startNode.getString("id") + true)
-                : connectionsMap.get(startNode.getString("id") + false);
-
-        if (nextNode != null) {
-            String nextNodeId = nextNode.getString("id");
-            result.append(indent).append(condition ? "True branch: " : "False branch: ")
-                    .append(nextNode.getString("text")).append("\n");
-            return generateIfElse(result, nextNodeId, nodeMap, connectionsMap, indent + "    ", student);
-        } else {
-            result.append(indent).append("End of path reached at node ID: ").append(nodeId).append("\n");
-            return nodeId; // Return current node ID if there are no further true/false branches to follow.
-        }
-    }
-
     private static boolean evaluateCondition(JSONObject startNode, Student student2, EligibilityChecker checker2) {
         String text = startNode.getString("text");
         if (text.startsWith("CGPA >=")) {
@@ -119,7 +132,7 @@ public class RuleInterpreter {
             int minFFAllowed = Integer.parseInt(parts[0].trim());
             boolean tableCourseEnabled = text.contains("T.Course: Enabled");
             if (tableCourseEnabled)
-                return checker2.checkTableCourses(student2);
+                return checker2.hasFailedTableCourseWithoutRetake(student2);
             else
                 return checker2.checkFFgrades(student2, maxFFAllowed, minFFAllowed);
         } else if (text.startsWith("WrL_COUNT")) {
@@ -136,6 +149,12 @@ public class RuleInterpreter {
             int maxAllowed = Integer.parseInt(parts[1].trim());
             int minAllowed = Integer.parseInt(parts[0].trim());
             return checker2.checkFailedCourses(student2, maxAllowed, minAllowed);
+        } else if (text.contains("not yükseltirsem")) {
+            Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
+            if (gpaMatcher.find()) {
+                double requiredGPA = Double.parseDouble(gpaMatcher.group(1));
+                return checker2.canGradeImprovementRaiseCGPA(student2, requiredGPA);
+            }
         }
 
         // Default condition if text is not recognized

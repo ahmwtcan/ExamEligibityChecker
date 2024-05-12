@@ -6,6 +6,7 @@ import com.automation.EligibilityChecker.EligibilityProcess;
 
 import java.util.List;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,12 +14,15 @@ import java.nio.file.Paths;
 public class GUI1 extends JFrame {
 
     private JButton uploadButton, checkButton;
-    private JLabel pdfNameLabel, nameLabel, statusLabel;
+    private JLabel pdfNameLabel, nameLabel, statusLabel, configStatusLabel, rulesStatusLabel;
     private JFileChooser fileChooser;
     private JProgressBar progressBar;
     private EligibilityChecker eligibilityChecker = new EligibilityChecker();
     private Student currentStudent;
     private JPanel flagsPanel;
+    private String rulesJson;
+    private String result;
+    private String configuredLogs;
 
     public GUI1() {
         initializeUI();
@@ -26,7 +30,7 @@ public class GUI1 extends JFrame {
 
     private void initializeUI() {
         setTitle("Exam Eligibility Checker");
-        setSize(800, 400); // Adjusted width to prevent overlap
+        setSize(1250, 600); // Adjusted width to prevent overlap
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout()); // Set BorderLayout for the content pane
         // Menu Bar
@@ -36,12 +40,19 @@ public class GUI1 extends JFrame {
         aboutItem.addActionListener(e -> showAboutDialog());
         helpMenu.add(aboutItem);
         menuBar.add(helpMenu);
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem uploadJsonItem = new JMenuItem("Upload Rules JSON");
+        uploadJsonItem.addActionListener(this::uploadJsonAction);
+        fileMenu.add(uploadJsonItem);
+        menuBar.add(fileMenu);
         setJMenuBar(menuBar); // Add the menu bar to the frame
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         JLabel greetingLabel = new JLabel("Welcome to the Exam Eligibility Checker");
         greetingLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        configStatusLabel = new JLabel("No configuration loaded.");
+        configStatusLabel.setFont(new Font("Arial", Font.BOLD, 12));
         topPanel.add(greetingLabel);
 
         JLabel explanationLabel = new JLabel(
@@ -52,6 +63,8 @@ public class GUI1 extends JFrame {
                         "</div></html>");
         explanationLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         topPanel.add(explanationLabel);
+        topPanel.add(configStatusLabel, BorderLayout.SOUTH);
+
         getContentPane().add(topPanel, BorderLayout.NORTH);
 
         // Center content
@@ -72,11 +85,14 @@ public class GUI1 extends JFrame {
         c.gridy = 1;
         centerPanel.add(nameLabel, c);
 
-        statusLabel = new JLabel("Exam Status: ");
+        statusLabel = new JLabel("Legacy Exam Status: ");
         statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        rulesStatusLabel = new JLabel("Configured Exam Status: ");
+        rulesStatusLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
         c.gridy = 2;
         centerPanel.add(statusLabel, c);
-
+        centerPanel.add(rulesStatusLabel, c);
         progressBar = new JProgressBar(0, 100);
         progressBar.setVisible(false);
         c.gridy = 3;
@@ -86,7 +102,7 @@ public class GUI1 extends JFrame {
 
         // Eligibility flags panel (East content)
         flagsPanel = new JPanel(new GridLayout(8, 1)); // Assuming 8 different flags
-        flagsPanel.setBorder(BorderFactory.createTitledBorder("Eligibility Flags"));
+        flagsPanel.setBorder(BorderFactory.createTitledBorder("Eligibility Logs"));
         addFlagsToPanel(); // Initialize with pending labels
         getContentPane().add(flagsPanel, BorderLayout.EAST);
 
@@ -100,7 +116,6 @@ public class GUI1 extends JFrame {
             try {
                 checkEligibilityAction();
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         });
@@ -128,6 +143,28 @@ public class GUI1 extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
+    private void uploadJsonAction(ActionEvent event) {
+        fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JSON files", "json"));
+
+        int returnValue = fileChooser.showOpenDialog(GUI1.this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                rulesJson = new String(Files.readAllBytes(selectedFile.toPath()));
+                configStatusLabel.setText("Configuration loaded: " + selectedFile.getName());
+                JOptionPane.showMessageDialog(this, "Rules JSON loaded successfully.", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                configStatusLabel.setText("Failed to load configuration.");
+                JOptionPane.showMessageDialog(this, "Failed to load the JSON file.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void uploadAction() {
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -140,6 +177,7 @@ public class GUI1 extends JFrame {
         addFlagsToPanel();
         flagsPanel.revalidate();
         flagsPanel.repaint();
+        rulesStatusLabel.setText("Configured Exam Status: ");
 
         int returnValue = fileChooser.showOpenDialog(GUI1.this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -147,6 +185,8 @@ public class GUI1 extends JFrame {
             pdfNameLabel.setText("Loaded: " + selectedFile.getName());
 
             String transcript = PdfParser.extractTextFromPDF(selectedFile.getAbsolutePath());
+
+            System.out.println("Transcript: " + transcript);
 
             // Get student from transcript (replace with your logic)
             Student student = DataHandler.getStudent(transcript);
@@ -161,15 +201,15 @@ public class GUI1 extends JFrame {
             System.out.println(student.courses.size());
             System.out.println("Semester count: " + student.semesterCount);
 
-            // // for (Semester semester : student.semesters) {
-            // // System.out.println(semester.semesterName + " " + semester.cgpa + " " +
-            // // semester.gpa + " "
-            // // + semester.completedCredits + " " + semester.totalCredits + "\n");
-            // // for (Course course : semester.courses) {
-            // // System.out.println(course.code + " " + course.name + " " + course.grade +
+            // for (Semester semester : student.semesters) {
+            // System.out.println(semester.semesterName + " " + semester.cgpa + " " +
+            // semester.gpa + " "
+            // + semester.completedCredits + " " + semester.totalCredits + "\n");
+            // for (Course course : semester.courses) {
+            // System.out.println(course.code + " " + course.name + " " + course.grade +
             // " "
-            // // + course.credits);
-            // // }
+            // + course.credits + " " + course.gradePoints + "\n");
+            // }
 
             // System.out.println("\n");
             // }
@@ -177,7 +217,6 @@ public class GUI1 extends JFrame {
             nameLabel.setText("Student Name: " + student.name);
             nameLabel.setVisible(true);
 
-            System.out.println(" strrrrrr" + student);
             currentStudent = student;
 
         }
@@ -190,25 +229,40 @@ public class GUI1 extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Ask pre-eligibility questions
-        boolean questionsPassed = askPreEligibilityQuestions();
-        if (!questionsPassed) {
+        Integer questionsPassed = askPreEligibilityQuestions();
+        if (questionsPassed == null) {
+            return;
+        } else if (questionsPassed == 0) {
             JOptionPane.showMessageDialog(this, "Based on your answers, you are not eligible.", "Not Eligible",
                     JOptionPane.WARNING_MESSAGE);
-            return; // Stop further processing if not eligible
+            return; // Stop further processing if not eligible return;
         }
-        String rulesJson = loadRulesJson(); // Implement this to load rules JSON from a file or resource
-
-        // Initialize the rule interpreter with the loaded rules and eligibility checker
-        RuleInterpreter ruleInterpreter = new RuleInterpreter(rulesJson, eligibilityChecker);
-        String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
-
-        System.out.println("Rule results: ");
-        System.out.println(ruleResults);
+        rulesJson = loadRulesJson();
 
         progressBar.setVisible(true);
         progressBar.setValue(0);
+        if (rulesJson != null) {
+            eligibilityChecker.process.message = "";
 
+            // Initialize the rule interpreter with the loaded rules and eligibility checker
+            RuleInterpreter ruleInterpreter = new RuleInterpreter(rulesJson, eligibilityChecker);
+            String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
+
+            System.out.println("Rule results: ");
+            System.out.println(ruleResults);
+
+            System.out.println("Process Logss : ");
+
+            configuredLogs = eligibilityChecker.process.message;
+            eligibilityChecker.process.message = "";
+
+            System.out.println(configuredLogs);
+
+            // extract final decision from rule results
+            String[] lines = ruleResults.split("\n");
+            String finalDecision = lines[lines.length - 1];
+            result = finalDecision.split(":")[1].trim();
+        }
         SwingWorker<EligibilityProcess, Integer> worker = new SwingWorker<EligibilityProcess, Integer>() {
             @Override
             protected EligibilityProcess doInBackground() throws Exception {
@@ -224,16 +278,16 @@ public class GUI1 extends JFrame {
                 }
                 statusLabel.setText("Done checking eligibility.");
 
-                System.out.println("Eligibility process: ");
-                System.out.println("WorLflag: " + process.WorLflag);
-                System.out.println("internshipFlag: " + process.internshipFlag);
-                System.out.println("allCoursesFlag: " + process.allCoursesFlag);
-                System.out.println("tableCourseFlag: " + process.tableCourseFlag);
-                System.out.println("GPAFlag: " + process.GPAFlag);
-                System.out.println("gradeImprovementFlag: " + process.gradeImprovementFlag);
-                System.out.println("maxStudyDurationFlag: " + process.maxStudyDurationFlag);
-                System.out.println("FFgradeFlag: " + process.FFgradeFlag);
-                System.out.println("examRight: " + process.examRight);
+                // System.out.println("Eligibility process: ");
+                // System.out.println("WorLflag: " + process.WorLflag);
+                // System.out.println("internshipFlag: " + process.internshipFlag);
+                // System.out.println("allCoursesFlag: " + process.allCoursesFlag);
+                // System.out.println("tableCourseFlag: " + process.tableCourseFlag);
+                // System.out.println("GPAFlag: " + process.GPAFlag);
+                // System.out.println("gradeImprovementFlag: " + process.gradeImprovementFlag);
+                // System.out.println("maxStudyDurationFlag: " + process.maxStudyDurationFlag);
+                // System.out.println("FFgradeFlag: " + process.FFgradeFlag);
+                // System.out.println("examRight: " + process.examRight);
 
                 return process;
             }
@@ -251,6 +305,7 @@ public class GUI1 extends JFrame {
                     updateFlagsPanel(process); // Update the flags panel based on the process results
 
                     statusLabel.setText("Exam Status: " + (process.examRight));
+                    rulesStatusLabel.setText("Configured Exam Status: " + result);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -272,7 +327,7 @@ public class GUI1 extends JFrame {
 
     }
 
-    private boolean askPreEligibilityQuestions() {
+    private Integer askPreEligibilityQuestions() {
         // Array to store the questions
         String[] questions = {
                 "Have you taken all the required courses at least once (pass/fail)?",
@@ -282,70 +337,58 @@ public class GUI1 extends JFrame {
 
         // Loop over the questions and ask them one by one
         for (String question : questions) {
-            int answer = JOptionPane.showConfirmDialog(
-                    this,
+            // Create a JOptionPane with Yes, No, and Cancel options
+            JOptionPane optionPane = new JOptionPane(
                     question,
-                    "Eligibility Pre-Check",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+                    JOptionPane.QUESTION_MESSAGE,
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            // Create a JDialog and add the JOptionPane to it
+            JDialog dialog = optionPane.createDialog(this, "Eligibility Pre-Check");
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setVisible(true);
+
+            // Get the user's answer
+            Integer answer = (Integer) optionPane.getValue();
+
+            // If the user clicked the close button or the cancel button, do nothing
+            if (answer == null || answer == JOptionPane.CANCEL_OPTION || answer == JOptionPane.CLOSED_OPTION) {
+                return null;
+            }
 
             if (question.equals(questions[1]) && answer == JOptionPane.NO_OPTION) {
-                return true;
+                return 1;
             }
 
             if (question.equals(questions[2]) && answer == JOptionPane.YES_OPTION) {
                 currentStudent.gotExamRightAndUsed = true;
-                return true;
+                return 1;
             } else if (question.equals(questions[2]) && answer == JOptionPane.NO_OPTION) {
                 currentStudent.gotExamRightAndUsed = false;
-                return false;
+                return 0;
             }
 
             if (answer == JOptionPane.NO_OPTION) {
-                return false;
+                return 0;
             }
         }
 
         // If all answers were YES, return true
-        return true;
+        return 1;
     }
 
     private void updateFlagsPanel(EligibilityProcess process) {
         // Clear existing flags
         flagsPanel.removeAll();
 
-        if (process.WorLflag) {
-            flagsPanel.add(new JLabel(formatFlag("Withdrawals or Leaves issue", true)));
-        }
-        if (process.internshipFlag) {
-            flagsPanel.add(new JLabel(formatFlag("Internship requirement not met", true)));
-        }
-        if (process.allCoursesFlag) {
-            flagsPanel.add(new JLabel(formatFlag("Not all courses taken", true)));
-        }
-        if (process.tableCourseFlag) {
-            flagsPanel.add(new JLabel(formatFlag("Failed course with no Exam Right", true)));
-        }
-        if (process.GPAFlag) {
-            flagsPanel.add(new JLabel(formatFlag("GPA is below 2.00", true)));
-        }
-        if (process.gradeImprovementFlag) {
-            flagsPanel.add(new JLabel(formatFlag("Grade improvement required", true)));
-        }
-        if (process.maxStudyDurationFlag) {
-            flagsPanel.add(new JLabel(formatFlag("Maximum study duration reached", true)));
-        }
-        if (process.FFgradeFlag) {
-            flagsPanel.add(new JLabel(formatFlag("More than 5 FF grades", true)));
+        String[] messages = process.message.split("\n");
+        for (String message : messages) {
+            flagsPanel.add(new JLabel(message));
         }
 
         // Ensure the panel updates to display the new components
         flagsPanel.revalidate();
         flagsPanel.repaint();
-    }
-
-    private String formatFlag(String label, boolean isIssue) {
-        return label + ": " + (isIssue ? "X" : "✓");
     }
 
     private void addFlagsToPanel() {
