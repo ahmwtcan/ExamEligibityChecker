@@ -6,8 +6,13 @@ import com.automation.EligibilityChecker.EligibilityProcess;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 import java.util.List;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -25,6 +30,7 @@ public class GUI1 extends JFrame {
     private String configuredLogs;
     private String legacyLogs;
     private JPanel configuredExamLogPanel;
+    private int studentCount = 1;
 
     public GUI1() {
         initializeUI();
@@ -241,6 +247,8 @@ public class GUI1 extends JFrame {
             File selectedFile = fileChooser.getSelectedFile();
             pdfNameLabel.setText("Loaded: " + selectedFile.getName());
 
+            // Extract text from PDF
+
             String transcript = PdfParser.extractTextFromPDF(selectedFile.getAbsolutePath());
 
             // Get student from transcript (replace with your logic)
@@ -256,19 +264,6 @@ public class GUI1 extends JFrame {
             System.out.println(student.courses.size());
             System.out.println("Semester count: " + student.semesterCount);
 
-            // for (Semester semester : student.semesters) {
-            // System.out.println(semester.semesterName + " " + semester.cgpa + " " +
-            // semester.gpa + " "
-            // + semester.completedCredits + " " + semester.totalCredits + "\n");
-            // for (Course course : semester.courses) {
-            // System.out.println(course.code + " " + course.name + " " + course.grade +
-            // " "
-            // + course.credits + " " + course.gradePoints + "\n");
-            // }
-
-            // System.out.println("\n");
-            // }
-
             nameLabel.setText("Student Name: " + student.name);
             nameLabel.setVisible(true);
 
@@ -278,7 +273,6 @@ public class GUI1 extends JFrame {
     }
 
     private void checkEligibilityAction() throws Exception {
-
         if (currentStudent == null) {
             JOptionPane.showMessageDialog(this, "Please upload a transcript first.", "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -290,54 +284,53 @@ public class GUI1 extends JFrame {
             return;
         }
 
-        // rulesJson = loadRulesJson();
-
         progressBar.setVisible(true);
         progressBar.setValue(0);
 
-        System.out.println("STUDENNNTTTTT: " + currentStudent);
+        // Assuming currentStudent has methods to retrieve necessary information
+        String studentInfo = String.format("Student No: %d, Semester Number: %d, Course Number: %d",
+                studentCount++, currentStudent.semesterCount,
+                currentStudent.courses.size());
 
         if (rulesJson != null) {
             eligibilityChecker.process.message = "";
 
-            // Initialize the rule interpreter with the loaded rules and eligibility checker
             RuleInterpreter ruleInterpreter = new RuleInterpreter(rulesJson, eligibilityChecker);
+            long ruleStartTime = System.currentTimeMillis();
             String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
+            long ruleEndTime = System.currentTimeMillis();
+            long ruleDuration = ruleEndTime - ruleStartTime;
 
-            System.out.println("Rule results: ");
-            System.out.println(ruleResults);
+            System.out.println("Rule results: " + ruleResults + "\nTime: " + ruleDuration + " ms");
 
-            System.out.println("Configured Logs : ");
-            configuredLogs = eligibilityChecker.process.message;
-            eligibilityChecker.process.message = "";
-            System.out.println(configuredLogs);
-
-            // Extract final decision from rule results
             String[] lines = ruleResults.split("\n");
-            String finalDecision = lines[lines.length - 1];
-            result = finalDecision.split(":")[1].trim();
+            String finalDecision = lines[lines.length - 1].split(":")[1].trim();
+            result = finalDecision;
 
-            System.out.println("Final Decision: " + result);
-
-            configuredLogs += "\n\n" + result;
-
+            configuredLogs = eligibilityChecker.process.message + "\n\n" + finalDecision;
+            logEligibilityCheck(studentInfo, "Configured Eligibility Check", ruleDuration, finalDecision);
         }
 
         SwingWorker<EligibilityProcess, Integer> worker = new SwingWorker<EligibilityProcess, Integer>() {
             @Override
             protected EligibilityProcess doInBackground() throws Exception {
+                long legacyStartTime = System.currentTimeMillis();
 
                 statusLabel.setText("Checking eligibility...");
-                System.out.println("Checking eligibility for student: " + currentStudent);
-
                 EligibilityProcess process = eligibilityChecker.checkEligibility(currentStudent);
 
+                long legacyEndTime = System.currentTimeMillis();
+                long legacyDuration = legacyEndTime - legacyStartTime;
+
                 for (int i = 1; i <= 100; i++) {
-                    publish(i); // Publish progress updates
-                    Thread.sleep(10); // Simulate some work
+                    publish(i);
+                    Thread.sleep(10);
                 }
 
-                statusLabel.setText("Done checking eligibility.");
+                statusLabel.setText("Done checking eligibility. Time: " + legacyDuration + " ms");
+
+                logEligibilityCheck(studentInfo, "Legacy Eligibility Check", legacyDuration,
+                        process.examRight.toString());
 
                 return process;
             }
@@ -351,25 +344,15 @@ public class GUI1 extends JFrame {
             @Override
             protected void done() {
                 try {
-                    EligibilityProcess process = get(); // Get the eligibility result
-                    // updateexamLogPanel(process); // Update the flags panel based on the process
-                    // results
-
+                    EligibilityProcess process = get();
                     legacyLogs = process.message;
 
-                    statusLabel.setText("Legacy Exam Status: " + (process.examRight));
+                    legacyLogs += "\n\n" + process.examRight.toString();
 
-                    if (result != null) {
-                        rulesStatusLabel.setText("Configured Exam Status: " + result);
-                    }
-
-                    legacyLogs += "\n\n" + process.examRight;
-
-                    System.out.println("Process Eaxm: " + process.examRight);
-                    // Enable view buttons after successful check
+                    statusLabel.setText("Legacy Exam Status: " + process.examRight);
+                    rulesStatusLabel.setText("Configured Exam Status: " + result);
                     viewLegacyLogButton.setEnabled(true);
                     viewConfiguredLogButton.setEnabled(true);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -382,6 +365,29 @@ public class GUI1 extends JFrame {
         worker.execute();
     }
 
+    private void logEligibilityCheck(String studentInfo, String checkType, long duration, String result) {
+        String logDirectoryPath = "C:\\Users\\Lenovo\\TranscriptApp"; // Define the directory for the log file
+        File directory = new File(logDirectoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create the directory if it doesn't exist
+        }
+
+        String logFilePath = logDirectoryPath + File.separator + "eligibility_checks.log";
+        try (FileWriter fw = new FileWriter(logFilePath, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println(new Date().toString() + " - " + checkType);
+            out.println(studentInfo);
+            out.println("Duration: " + duration + " ms");
+            out.println("Result: " + result);
+            out.println();
+        } catch (IOException e) {
+            System.err.println("Error writing to log file: " + e.getMessage());
+            // Consider adding more robust error handling here if necessary
+        }
+    }
+
+    @SuppressWarnings("unused")
     private String loadRulesJson() throws Exception {
 
         String jsonText = new String(Files.readAllBytes(Paths

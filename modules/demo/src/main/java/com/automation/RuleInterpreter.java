@@ -98,7 +98,7 @@ public class RuleInterpreter {
     private static String findStartNodeId(Map<String, JSONObject> nodeMap) {
         for (Map.Entry<String, JSONObject> entry : nodeMap.entrySet()) {
             JSONObject node = entry.getValue().getJSONObject("startNode");
-            if (node.getString("text").equals("Start")) {
+            if (node.getString("text").equals("Başlangıç")) {
                 return node.getString("id");
             }
         }
@@ -121,21 +121,21 @@ public class RuleInterpreter {
         if (text.startsWith("CGPA >=")) {
             double requiredGPA = Double.parseDouble(text.substring(8).trim());
             return checker2.checkGPA(student2, requiredGPA);
-        } else if (text.startsWith("Study Duration >=")) {
-            int maxDuration = Integer.parseInt(text.substring(18).trim());
+        } else if (text.startsWith("Eğitim Süresi (Dönem) >=")) {
+            int maxDuration = Integer.parseInt(text.substring(24).trim());
             System.out.println("maxDuration: " + maxDuration);
             return checker2.checkMaxStudyDuration(student2, maxDuration);
-        } else if (text.startsWith("FF_COUNT")) {
+        } else if (text.startsWith("FF_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxFFAllowed = Integer.parseInt(parts[1].trim());
             int minFFAllowed = Integer.parseInt(parts[0].trim());
-            boolean tableCourseEnabled = text.contains("T.Course: Enabled");
+            boolean tableCourseEnabled = text.contains("T.Dersi: Evet");
             if (tableCourseEnabled)
                 return checker2.hasFailedTableCourseWithoutRetake(student2);
             else
                 return checker2.checkFFgrades(student2, maxFFAllowed, minFFAllowed);
-        } else if (text.startsWith("WrL_COUNT")) {
+        } else if (text.startsWith("WrL_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxAllowed = Integer.parseInt(parts[1].trim());
@@ -143,7 +143,7 @@ public class RuleInterpreter {
             return checker2.checkWorLgrades(student2, maxAllowed, minAllowed);
         } else if (text.matches(".*\\bXX400\\b.*")) {
             return checker2.checkInternship(student2);
-        } else if (text.startsWith("FAILED_COUNT")) {
+        } else if (text.startsWith("BAŞARISIZ_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxAllowed = Integer.parseInt(parts[1].trim());
@@ -172,30 +172,32 @@ public class RuleInterpreter {
 
     private static String generateCondition(JSONObject node, Student student, EligibilityChecker checker) {
         String text = node.getString("text");
+
         if (text.startsWith("CGPA >=")) {
             double requiredGPA = Double.parseDouble(text.substring(8).trim());
-            return "checker.checkGPA(student, " + requiredGPA + ")";
-        } else if (text.startsWith("Study Duration >=")) {
-            int maxDuration = Integer.parseInt(text.substring(18).trim());
-            return "checker.checkMaxStudyDuration(student, " + maxDuration + ")";
-        } else if (text.startsWith("FF_COUNT")) {
+            return "student.getCGPA() >= " + requiredGPA;
+        } else if (text.startsWith("Eğitim Süresi (Dönem) >=")) {
+            int maxDuration = Integer.parseInt(text.substring(22).trim());
+            return "student.getSemesterCount() >= " + maxDuration;
+        } else if (text.startsWith("FF_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxFFAllowed = Integer.parseInt(parts[1].trim());
             int minFFAllowed = Integer.parseInt(parts[0].trim());
-            boolean tableCourseEnabled = text.contains("T.Course: Enabled");
+            boolean tableCourseEnabled = text.contains("T.Dersi: Evet");
             if (tableCourseEnabled)
-                return "checker.checkFFgrades(student, " + maxFFAllowed + ", " + minFFAllowed + ", true)";
+                return "checker.hasFailedTableCourseWithoutRetake(student)";
             else
                 return "checker.checkFFgrades(student, " + maxFFAllowed + ", " + minFFAllowed + ")";
-        } else if (text.startsWith("WrL_COUNT")) {
+        } else if (text.startsWith("WrL_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxAllowed = Integer.parseInt(parts[1].trim());
-            return "checker.checkWithdrawalAndLeavesCount(student, " + maxAllowed + ")";
+            int minAllowed = Integer.parseInt(parts[0].trim());
+            return "checker.checkWorLgrades(student, " + maxAllowed + ", " + minAllowed + ")";
         } else if (text.matches(".*\\bXX400\\b.*")) {
             return "checker.checkInternship(student)";
-        } else if (text.startsWith("FAILED_COUNT")) {
+        } else if (text.startsWith("BAŞARISIZ_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
             String[] parts = details.split("<=");
             int maxAllowed = Integer.parseInt(parts[1].trim());
@@ -207,6 +209,7 @@ public class RuleInterpreter {
                 double requiredGPA = Double.parseDouble(gpaMatcher.group(1));
                 return "checker.canGradeImprovementRaiseCGPA(student, " + requiredGPA + ")";
             }
+
         } else if (text.matches(".*(bütün dersleri).*")
                 && (text.matches(".*(başarılı|başarısız).*") || text.matches(".*(hepsinin).*"))) {
             return "checker.isAllCoursesTaken(student)";
@@ -216,7 +219,6 @@ public class RuleInterpreter {
                 ".*(hakkımda).*(ek\\s*sınav|ek_sınav|ek\\s*sınavları|ek\\s*imtihan|derse\\s*bir\\s*defa\\s*devam).*((kararı\\s*alınmıştı)|(kararı\\s*alındı)).*")) {
             return "checker.gotExamRight(student)";
         }
-
         // Default condition if text is not recognized
         return "true";
     }

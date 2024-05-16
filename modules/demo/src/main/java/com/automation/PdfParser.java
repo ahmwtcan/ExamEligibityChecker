@@ -5,6 +5,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,8 +15,7 @@ public class PdfParser {
 
     public static void main(String[] args) {
 
-        String transs = extractTextFromPDF(
-                "C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\transkipt.pdf");
+        String transs = extractFromResources(TableCourse.class.getResourceAsStream("/Tablo1.pdf"));
 
         System.out.println(transs);
     }
@@ -32,18 +32,28 @@ public class PdfParser {
         return null;
     }
 
+    public static String extractFromResources(InputStream pdfStream) {
+        try (PDDocument document = PDDocument.load(pdfStream)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(document);
+            document.close();
+            return text;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static List<TableCourse> parseTableCourses() {
         List<TableCourse> courses = new ArrayList<>();
-        String filePath = "C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\Tablo1.pdf";
-        String tableText = extractTextFromPDF(filePath);
-        String[] lines = tableText.split("\\r?\\n"); // Split by new lines
+        InputStream inputStream = TableCourse.class.getResourceAsStream("/Tablo1.pdf");
+        String tableText = extractFromResources(inputStream);
+        String[] lines = tableText.split("\\r?\\n");
         Pattern coursePattern = Pattern.compile("([A-Z]{2,4}\\s\\d{3,4}\\*?)\\s([A-Za-z0-9\\s&,.:'-]+)");
         Pattern splitPattern = Pattern.compile("(?<=\\*)(?=\\s[A-Z]{2,4}\\s\\d{3,4})");
 
         for (String line : lines) {
-            // Check if line contains a course code immediately following an asterisk
             if (splitPattern.matcher(line).find()) {
-                // Split the line into two assuming only one such pattern exists per line
                 String[] splitCourses = splitPattern.split(line, 2);
                 for (String course : splitCourses) {
                     Matcher matcher = coursePattern.matcher(course.trim());
@@ -52,7 +62,6 @@ public class PdfParser {
                     }
                 }
             } else {
-                // Regular course parsing
                 Matcher matcher = coursePattern.matcher(line);
                 if (matcher.find()) {
                     courses.add(new TableCourse(matcher.group(1), matcher.group(2)));

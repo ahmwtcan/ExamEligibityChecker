@@ -1,0 +1,55 @@
+Wed May 15 19:10:51 TRT 2024 - Configured Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 10 ms
+Result: ILISIGI_KESILDI
+
+Wed May 15 19:10:52 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 9 ms
+Result: HAK_YOK
+
+Wed May 15 19:19:44 TRT 2024 - Configured Eligibility Check
+Student Name: Mr. EREN YILDIZ, Semester Number: 15, Course Number: 103
+Duration: 30 ms
+Result: EK_SINAV
+
+Wed May 15 19:19:46 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. EREN YILDIZ, Semester Number: 15, Course Number: 103
+Duration: 5 ms
+Result: SINAV
+
+Wed May 15 19:21:42 TRT 2024 - Configured Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 30 ms
+Result: SINIRSIZ_SINAV
+
+Wed May 15 19:21:43 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 34 ms
+Result: HAK_YOK
+
+Wed May 15 19:23:29 TRT 2024 - Configured Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 23 ms
+Result: SINIRSIZ_SINAV
+
+Wed May 15 19:23:30 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 12 ms
+Result: HAK_YOK
+
+Wed May 15 19:25:30 TRT 2024 - Configured Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 22 ms
+Result: HAK_YOK
+
+Wed May 15 19:25:32 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 14 ms
+Result: HAK_YOK
+
+Wed May 15 19:35:17 TRT 2024 - Legacy Eligibility Check
+Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
+Duration: 4 ms
+Result: HAK_YOK
+

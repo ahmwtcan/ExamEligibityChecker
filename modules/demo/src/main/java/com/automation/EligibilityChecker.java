@@ -74,7 +74,7 @@ public class EligibilityChecker {
                 process.message += "Student has " + ffCount + " FF grades " + "\n";
 
                 process.FFgradeFlag = false;
-                process.examRight = ExamRight.EK_SINAV;
+                process.examRight = ExamRight.SINAV;
                 return process;
             } else if (ffCount == 1) {
                 System.out.println("Student has 1 FF grade");
@@ -637,6 +637,7 @@ public class EligibilityChecker {
         SINIRSIZ_SINAV,
         BELIRLI_DONEM_SINAV_HAKKI,
         HAK_YOK,
+        SINAV,
         DERSE_DEVAM,
         ILISIGI_KESILDI
     }
