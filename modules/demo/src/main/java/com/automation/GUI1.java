@@ -123,7 +123,6 @@ public class GUI1 extends JFrame {
         // Eligibility flags panel (East content)
         examLogPanel = new JPanel(new GridLayout(8, 1));
         examLogPanel.setBorder(BorderFactory.createTitledBorder("Eligibility Logs"));
-        addFlagsToPanel();
         getContentPane().add(examLogPanel, BorderLayout.EAST);
 
         // South content (buttons)
@@ -239,7 +238,6 @@ public class GUI1 extends JFrame {
         viewConfiguredLogButton.setEnabled(false);
         viewLegacyLogButton.setEnabled(false);
 
-        addFlagsToPanel();
         rulesStatusLabel.setText("Configured Exam Status: ");
 
         int returnValue = fileChooser.showOpenDialog(GUI1.this);
@@ -260,9 +258,6 @@ public class GUI1 extends JFrame {
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            System.out.println(student.courses.size());
-            System.out.println("Semester count: " + student.semesterCount);
 
             nameLabel.setText("Student Name: " + student.name);
             nameLabel.setVisible(true);
@@ -300,8 +295,6 @@ public class GUI1 extends JFrame {
             String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
             long ruleEndTime = System.currentTimeMillis();
             long ruleDuration = ruleEndTime - ruleStartTime;
-
-            System.out.println("Rule results: " + ruleResults + "\nTime: " + ruleDuration + " ms");
 
             String[] lines = ruleResults.split("\n");
             String finalDecision = lines[lines.length - 1].split(":")[1].trim();
@@ -350,7 +343,12 @@ public class GUI1 extends JFrame {
                     legacyLogs += "\n\n" + process.examRight.toString();
 
                     statusLabel.setText("Legacy Exam Status: " + process.examRight);
-                    rulesStatusLabel.setText("Configured Exam Status: " + result);
+
+                    if (result != null) {
+                        rulesStatusLabel.setText("Configured Exam Status: " + result);
+                    } else {
+                        rulesStatusLabel.setText("Configured Exam Status: No ruleset uploaded.");
+                    }
                     viewLegacyLogButton.setEnabled(true);
                     viewConfiguredLogButton.setEnabled(true);
                 } catch (Exception e) {
@@ -451,18 +449,6 @@ public class GUI1 extends JFrame {
 
         // If all answers were YES, return true
         return 1;
-    }
-
-    private void addFlagsToPanel() {
-        examLogPanel.add(new JLabel("Withdrawals and Leaves"));
-        examLogPanel.add(new JLabel("Internship"));
-        examLogPanel.add(new JLabel("All Courses Taken"));
-        examLogPanel.add(new JLabel("Table Course"));
-        examLogPanel.add(new JLabel("GPA"));
-        examLogPanel.add(new JLabel("Max Study Duration"));
-        examLogPanel.add(new JLabel("FF Grades"));
-        examLogPanel.add(new JLabel("Grade Improvement"));
-
     }
 
     public static void main(String[] args) {

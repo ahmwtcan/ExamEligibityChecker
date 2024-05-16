@@ -34,17 +34,13 @@ public class DataHandler {
                     .compile("Completed\\/Total\\s*Credits\\s*(?:\\b|\\s)?(\\d+)\\s*(?:\\/|\\s)?(\\d+)\\s*");
 
             Matcher totalCreditsMatcher = totalCreditsPattern.matcher(transcript);
+            @SuppressWarnings("unused")
             String cCredits = "";
             String totalCredits = "";
             if (totalCreditsMatcher.find()) {
                 cCredits = totalCreditsMatcher.group(1);
                 totalCredits = totalCreditsMatcher.group(2);
             }
-
-            System.out.println("Name: " + name);
-            System.out.println("Student Number: " + studentNumber);
-            System.out.println("Completed Credits: " + cCredits);
-            System.out.println("Total Credits: " + totalCredits);
             List<Semester> semesters = parseTranscript(transcript);
 
             List<Course> courses = new ArrayList<>();
@@ -64,7 +60,6 @@ public class DataHandler {
                     false, countSemester(semesters), Integer.parseInt(totalCredits));
 
         } else {
-            System.out.println("Failed to match extended info. Check regex and transcript format.");
         }
         return null;
 

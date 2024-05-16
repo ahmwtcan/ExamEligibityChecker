@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 
 public class PdfParser {
 
-    public static void main(String[] args) {
+    // public static void main(String[] args) {
 
-        String transs = extractFromResources(TableCourse.class.getResourceAsStream("/Tablo1.pdf"));
+    // String transs =
+    // extractFromResources(TableCourse.class.getResourceAsStream("/Tablo1.pdf"));
 
-        System.out.println(transs);
-    }
+    // }
 
     public static String extractTextFromPDF(String filePath) {
         try (PDDocument document = PDDocument.load(new File(filePath))) {
