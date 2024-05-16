@@ -9,7 +9,6 @@
   <version>0.1.0</version>
 
   <name>demo</name>
-  <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
   <properties>
@@ -50,7 +49,7 @@
                     <manifest>
                         <addClasspath>true</addClasspath>
                         <classpathPrefix>lib/</classpathPrefix>
-                        <mainClass>com.automation.YourMainClass</mainClass>
+                        <mainClass>com.automation.GUI1</mainClass>
                     </manifest>
                 </archive>
             </configuration>
@@ -62,7 +61,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>com.automation.YourMainClass</mainClass>
+                        <mainClass>com.automation.GUI1</mainClass>
                     </manifest>
                 </archive>
                 <descriptorRefs>
