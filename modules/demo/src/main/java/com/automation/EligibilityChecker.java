@@ -32,8 +32,7 @@ public class EligibilityChecker {
         if (student.maxStudyDurationExceeded) {
             System.out.println("Student has exceeded the maximum study duration");
 
-            if (!hasFailedTableCourseWithoutRetake(student)
-                    && !checkWorLgrades(student, maxWLCount = 15, minWLCount = 6)) {
+            if (hasExcessiveTotalFailures(student, 6)) {
                 process.tableCourseFlag = true;
                 process.examRight = ExamRight.ILISIGI_KESILDI;
                 return process;
@@ -240,7 +239,6 @@ public class EligibilityChecker {
     private static boolean isPassingGrade(String grade) {
         // Exclude non-passing grades, considering additional notes like "(R)"
         // (Repeated) or specific annotations.
-        // Adjust the pattern to correctly handle cases such as "FF(R)" or "NC(AA)".
 
         return !grade.matches("^(W|L|NC|FF|FA|I|X|T|ND|ADD|DR|AU).*");
     }
@@ -348,6 +346,42 @@ public class EligibilityChecker {
         }
 
         return false; // No table courses with failed attempts without successful retakes found
+    }
+
+    public boolean hasExcessiveTotalFailures(Student student, int maxNumber) {
+        // Map to track if the student passed the course after failing or withdrawing.
+        HashMap<String, Boolean> passedCourses = new HashMap<>();
+
+        for (Course course : student.courses) {
+            for (TableCourse tableCourse : tableCourses) {
+                if (course.code.equals(tableCourse.getCode())) {
+                    System.out.println("Table course found: " + course.code + " " + course.grade);
+                    if (isPassingGrade(course.grade)) {
+                        passedCourses.put(course.code, true); // Mark that the course was passed eventually.
+                    } else if (!isPassingGrade(course.grade)) {
+                        passedCourses.putIfAbsent(course.code, false); // Mark as not passed, only if not already
+                                                                       // passed.
+                    }
+                }
+            }
+        }
+
+        // Count the number of courses that were never passed after failing or
+        // withdrawing.
+        long failedCoursesCount = passedCourses.values().stream().filter(passed -> !passed).count();
+
+        // Log and return based on the count compared to maxNumber
+        if (failedCoursesCount > maxNumber) {
+            System.out.println("Student has excessive total failures/withdrawals: " + failedCoursesCount);
+            process.message += "Student has excessive total failures/withdrawals: " + failedCoursesCount + "\n";
+            return true;
+        }
+        System.out
+                .println("Student has not exceeded the maximum number of failures/withdrawals: " + failedCoursesCount);
+        process.message += "Student has not exceeded the maximum number of failures/withdrawals: " + failedCoursesCount
+                + "\n";
+
+        return false;
     }
 
     public boolean checkFFgrades(Student student, int maxFFCount, int minFFCount) {

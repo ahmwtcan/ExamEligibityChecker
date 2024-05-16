@@ -1,0 +1,5 @@
+Oturum Numarası: 1
+Uygulama başlangıç zamanı: 2024-05-16T16:49:23.975165200
+Uygulama bitiş zamanı: 2024-05-16T16:49:28.569541600
+Geçen süre: 0 saat 0 dakika 4 saniye
+-------------

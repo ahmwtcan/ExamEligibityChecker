@@ -3,8 +3,6 @@ package com.automation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -148,7 +146,13 @@ public class RuleInterpreter {
             String[] parts = details.split("<=");
             int maxAllowed = Integer.parseInt(parts[1].trim());
             int minAllowed = Integer.parseInt(parts[0].trim());
-            return checker2.checkFailedCourses(student2, maxAllowed, minAllowed);
+            if (text.contains("T.Dersi: Evet")) {
+                System.out.println("T.Dersi: Evet");
+                return checker2.hasExcessiveTotalFailures(student2, minAllowed);
+            } else {
+
+                return checker2.checkFailedCourses(student2, maxAllowed, minAllowed);
+            }
         } else if (text.contains("not yükseltirsem") || text.matches(".*\\d+\\.\\d{2}\\+.*")) {
             Matcher gpaMatcher = Pattern.compile("(\\d+\\.\\d+)\\+").matcher(text);
             if (gpaMatcher.find()) {
@@ -223,6 +227,7 @@ public class RuleInterpreter {
         return "true";
     }
 
+    @SuppressWarnings("unused")
     private static void generateIfElse(StringBuilder javaCode, String nodeId, Map<String, JSONObject> nodeMap,
             Map<String, JSONObject> connectionsMap, String indent) {
         JSONObject currentNode = nodeMap.get(nodeId);
@@ -251,18 +256,19 @@ public class RuleInterpreter {
         javaCode.append(indent).append("}\n");
     }
 
-    public static void main(String[] args) throws Exception {
-        String jsonText = new String(Files.readAllBytes(Paths
-                .get("C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\rules.json")));
-        JSONArray rules = new JSONArray(jsonText);
-        Map<String, JSONObject> nodeMap = buildNodeMap(rules);
-        Map<String, JSONObject> connectionsMap = buildConnectionsMap(rules);
-        StringBuilder javaCode = new StringBuilder();
-        String startNodeId = findStartNodeId(nodeMap); // Find the start node ID dynamically
+    // public static void main(String[] args) throws Exception {
+    // String jsonText = new String(Files.readAllBytes(Paths
+    // .get("C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\rules.json")));
+    // JSONArray rules = new JSONArray(jsonText);
+    // Map<String, JSONObject> nodeMap = buildNodeMap(rules);
+    // Map<String, JSONObject> connectionsMap = buildConnectionsMap(rules);
+    // StringBuilder javaCode = new StringBuilder();
+    // String startNodeId = findStartNodeId(nodeMap); // Find the start node ID
+    // dynamically
 
-        generateIfElse(javaCode, startNodeId, nodeMap, connectionsMap, "");
-        System.out.println(javaCode.toString());
+    // generateIfElse(javaCode, startNodeId, nodeMap, connectionsMap, "");
+    // System.out.println(javaCode.toString());
 
-    }
+    // }
 
 }
