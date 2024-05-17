@@ -44,17 +44,21 @@ public class GUI1 extends JFrame {
 
         // Menu Bar
         JMenuBar menuBar = new JMenuBar();
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.addActionListener(e -> showAboutDialog());
-        helpMenu.add(aboutItem);
-        menuBar.add(helpMenu);
         JMenu fileMenu = new JMenu("File");
         JMenuItem uploadJsonItem = new JMenuItem("Upload Rules JSON");
         uploadJsonItem.addActionListener(this::uploadJsonAction);
         fileMenu.add(uploadJsonItem);
         menuBar.add(fileMenu);
         setJMenuBar(menuBar);
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem aboutItem = new JMenuItem("About");
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener(e -> System.exit(0));
+        aboutItem.addActionListener(e -> showAboutDialog());
+        helpMenu.add(aboutItem);
+        helpMenu.add(exitItem);
+        menuBar.add(helpMenu);
+
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         JLabel greetingLabel = new JLabel("Welcome to the Exam Eligibility Checker");
