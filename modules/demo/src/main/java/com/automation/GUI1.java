@@ -364,13 +364,19 @@ public class GUI1 extends JFrame {
     }
 
     private void logEligibilityCheck(String studentInfo, String checkType, long duration, String result) {
-        String logDirectoryPath = "C:\\Users\\Lenovo\\TranscriptApp"; // Define the directory for the log file
-        File directory = new File(logDirectoryPath);
+        String workingDir = System.getProperty("user.dir");
+
+        // Log file path relative to the working directory
+        String logFilePath = workingDir + File.separator + "eligibility_checks.log";
+
+        // Ensure directory exists (this might not be necessary if you're writing to the
+        // working directory)
+        File logFile = new File(logFilePath);
+        File directory = logFile.getParentFile();
         if (!directory.exists()) {
-            directory.mkdirs(); // Create the directory if it doesn't exist
+            directory.mkdirs();
         }
 
-        String logFilePath = logDirectoryPath + File.separator + "eligibility_checks.log";
         try (FileWriter fw = new FileWriter(logFilePath, true);
                 BufferedWriter bw = new BufferedWriter(fw);
                 PrintWriter out = new PrintWriter(bw)) {
@@ -381,7 +387,7 @@ public class GUI1 extends JFrame {
             out.println();
         } catch (IOException e) {
             System.err.println("Error writing to log file: " + e.getMessage());
-            // Consider adding more robust error handling here if necessary
+
         }
     }
 
