@@ -16,6 +16,7 @@ public class DataHandler {
     // pattern for CGPA: 2.73 GPA: 3.79
     private static final Pattern CGPA_PATTERN = Pattern.compile("^CGPA:\\s*(\\d+\\.\\d+)\\s*GPA:\\s*(\\d+\\.\\d+)$",
             Pattern.MULTILINE);
+    private static boolean isMoreThanSevenYears;
 
     public static Student getStudent(String transcript) {
 
@@ -55,7 +56,8 @@ public class DataHandler {
                 completedCredits += semester.completedCredits;
             }
 
-            return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses, false, true,
+            return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses,
+                    isMoreThanSevenYears, true,
                     false,
                     false, countSemester(semesters), Integer.parseInt(totalCredits));
 
@@ -103,13 +105,32 @@ public class DataHandler {
     // count semerster number excluding summer
     public static int countSemester(List<Semester> semesters) {
         Pattern summerPattern = Pattern.compile("SUMMER");
+        Pattern yearPattern = Pattern.compile("(\\d{4})");
         int count = 0;
+        int firstYear = -1;
+        int lastYear = -1;
+
         for (Semester semester : semesters) {
-            Matcher semesterMatcher = summerPattern.matcher(semester.semesterName);
-            if (!semesterMatcher.find()) { // If the name does not match "SUMMER"
+
+            Matcher summerMatcher = summerPattern.matcher(semester.semesterName);
+            if (!summerMatcher.find()) { // If the name does not match "SUMMER"
                 count++;
             }
+
+            Matcher yearMatcher = yearPattern.matcher(semester.semesterName);
+            if (yearMatcher.find()) {
+                int year = Integer.parseInt(yearMatcher.group(1));
+                if (firstYear == -1) {
+                    firstYear = year;
+                }
+                lastYear = year;
+            }
         }
+
+        // Check if the duration between the first and last semester is more than 7
+        // years
+        isMoreThanSevenYears = (lastYear - firstYear + 1) > 7;
+
         return count;
     }
 
