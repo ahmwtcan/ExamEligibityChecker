@@ -295,36 +295,41 @@ public class GUI1 extends JFrame {
             eligibilityChecker.process.message = "";
 
             RuleInterpreter ruleInterpreter = new RuleInterpreter(rulesJson, eligibilityChecker);
-            long ruleStartTime = System.currentTimeMillis();
+
+            long ruleStartTime = System.nanoTime();
+
             String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
-            long ruleEndTime = System.currentTimeMillis();
-            long ruleDuration = ruleEndTime - ruleStartTime;
 
             String[] lines = ruleResults.split("\n");
             String finalDecision = lines[lines.length - 1].split(":")[1].trim();
             result = finalDecision;
 
             configuredLogs = eligibilityChecker.process.message + "\n\n" + finalDecision;
+            long ruleEndTime = System.nanoTime();
+
+            long ruleDuration = (ruleEndTime - ruleStartTime) / 100000;
+
             logEligibilityCheck(studentInfo, "Configured Eligibility Check", ruleDuration, finalDecision);
+
         }
 
         SwingWorker<EligibilityProcess, Integer> worker = new SwingWorker<EligibilityProcess, Integer>() {
             @Override
             protected EligibilityProcess doInBackground() throws Exception {
-                long legacyStartTime = System.currentTimeMillis();
+                long legacyStartTime = System.nanoTime();
 
                 statusLabel.setText("Checking eligibility...");
                 EligibilityProcess process = eligibilityChecker.checkEligibility(currentStudent);
 
-                long legacyEndTime = System.currentTimeMillis();
-                long legacyDuration = legacyEndTime - legacyStartTime;
+                long legacyEndTime = System.nanoTime();
+                long legacyDuration = (legacyEndTime - legacyStartTime) / 100000;
 
                 for (int i = 1; i <= 100; i++) {
                     publish(i);
                     Thread.sleep(10);
                 }
 
-                statusLabel.setText("Done checking eligibility. Time: " + legacyDuration + " ms");
+                statusLabel.setText("Done checking eligibility. Time: " + legacyDuration + " tenths of ms");
 
                 logEligibilityCheck(studentInfo, "Legacy Eligibility Check", legacyDuration,
                         process.examRight.toString());
@@ -386,7 +391,7 @@ public class GUI1 extends JFrame {
                 PrintWriter out = new PrintWriter(bw)) {
             out.println(new Date().toString() + " - " + checkType);
             out.println(studentInfo);
-            out.println("Duration: " + duration + " ms");
+            out.println("Duration: " + duration + " tenths of ms");
             out.println("Result: " + result);
             out.println();
         } catch (IOException e) {

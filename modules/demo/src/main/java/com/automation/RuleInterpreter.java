@@ -121,7 +121,6 @@ public class RuleInterpreter {
             return checker2.checkGPA(student2, requiredGPA);
         } else if (text.startsWith("Eğitim Süresi (Dönem) >=")) {
             int maxDuration = Integer.parseInt(text.substring(24).trim());
-            System.out.println("maxDuration: " + maxDuration);
             return checker2.checkMaxStudyDuration(student2, maxDuration);
         } else if (text.startsWith("FF_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
