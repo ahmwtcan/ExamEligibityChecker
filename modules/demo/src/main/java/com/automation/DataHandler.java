@@ -127,6 +127,15 @@ public class DataHandler {
             }
         }
 
+        // Check if last year is smaller then current year
+        if (lastYear < Calendar.getInstance().get(Calendar.YEAR)) {
+            lastYear = Calendar.getInstance().get(Calendar.YEAR);
+        }
+
+        System.out.println("First Year: " + firstYear);
+
+        System.out.println("Last Year: " + lastYear);
+
         // Check if the duration between the first and last semester is more than 7
         // years
         isMoreThanSevenYears = (lastYear - firstYear + 1) > 7;

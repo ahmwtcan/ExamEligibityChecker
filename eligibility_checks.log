@@ -253,3 +253,18 @@ Student No: 6, Semester Number: 15, Course Number: 103
 Duration: 25 ms
 Result: SINAV
 
+Mon May 20 13:41:51 TRT 2024 - Configured Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 82 tenths of ms
+Result: SINAV
+
+Mon May 20 13:41:53 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 45 tenths of ms
+Result: SINAV
+
+Mon May 20 15:47:33 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 152 tenths of ms
+Result: SINAV
+
