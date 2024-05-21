@@ -3,6 +3,8 @@ package com.automation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -180,7 +182,7 @@ public class RuleInterpreter {
             double requiredGPA = Double.parseDouble(text.substring(8).trim());
             return "student.getCGPA() >= " + requiredGPA;
         } else if (text.startsWith("Eğitim Süresi (Dönem) >=")) {
-            int maxDuration = Integer.parseInt(text.substring(22).trim());
+            int maxDuration = Integer.parseInt(text.substring(24).trim());
             return "student.getSemesterCount() >= " + maxDuration;
         } else if (text.startsWith("FF_SAYISI")) {
             String details = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
@@ -255,19 +257,18 @@ public class RuleInterpreter {
         javaCode.append(indent).append("}\n");
     }
 
-    // public static void main(String[] args) throws Exception {
-    // String jsonText = new String(Files.readAllBytes(Paths
-    // .get("C:\\Users\\Lenovo\\Desktop\\test\\modules\\demo\\src\\main\\java\\com\\automation\\rules.json")));
-    // JSONArray rules = new JSONArray(jsonText);
-    // Map<String, JSONObject> nodeMap = buildNodeMap(rules);
-    // Map<String, JSONObject> connectionsMap = buildConnectionsMap(rules);
-    // StringBuilder javaCode = new StringBuilder();
-    // String startNodeId = findStartNodeId(nodeMap); // Find the start node ID
-    // dynamically
+    public static void main(String[] args) throws Exception {
+        String jsonText = new String(Files.readAllBytes(Paths
+                .get("C:\\Users\\Lenovo\\Documents\\genelRule.json")));
+        JSONArray rules = new JSONArray(jsonText);
+        Map<String, JSONObject> nodeMap = buildNodeMap(rules);
+        Map<String, JSONObject> connectionsMap = buildConnectionsMap(rules);
+        StringBuilder javaCode = new StringBuilder();
+        String startNodeId = findStartNodeId(nodeMap); // Find the start node ID
 
-    // generateIfElse(javaCode, startNodeId, nodeMap, connectionsMap, "");
-    // System.out.println(javaCode.toString());
+        generateIfElse(javaCode, startNodeId, nodeMap, connectionsMap, "");
+        System.out.println(javaCode.toString());
 
-    // }
+    }
 
 }

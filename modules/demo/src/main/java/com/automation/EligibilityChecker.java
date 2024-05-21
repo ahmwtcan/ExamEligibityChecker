@@ -230,16 +230,20 @@ public class EligibilityChecker {
     }
 
     boolean checkInternship(Student student) {
-        String intershipRegex = "([A-Z]{2,3} 400)";
+        String internshipRegex = "([A-Z]{2,3} 400)";
+        // Regex to match "P", "P(R)", "P (R)", "P (R)", etc.
+        String passedGradeRegex = "P\\s*\\(R\\)|P";
 
         for (Course course : student.courses) {
-            if (course.code.matches(intershipRegex) && !course.grade.equals("P")) {
-                process.message += "Student has not passed the internship course: " + course.code + "\n";
-                return false;
-            } else if (course.code.matches(intershipRegex) && course.grade.equals("P")) {
-                process.message += "Student has passed the internship course: " + course.code + "  " + course.grade
-                        + "\n";
-                return true;
+            if (course.code.matches(internshipRegex)) {
+                if (course.grade.matches(passedGradeRegex)) {
+                    process.message += "Student has passed the internship course: " + course.code + "  " + course.grade
+                            + "\n";
+                    return true;
+                } else {
+                    process.message += "Student has not passed the internship course: " + course.code + "\n";
+                    return false;
+                }
             }
         }
         process.message += "Student has not taken the internship course" + "\n";
