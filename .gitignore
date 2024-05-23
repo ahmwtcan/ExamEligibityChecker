@@ -15,3 +15,13 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.har
+*.ipr
+*.iws
+*.iml
