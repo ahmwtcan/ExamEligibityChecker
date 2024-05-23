@@ -135,6 +135,8 @@ public class EligibilityChecker {
         // 5. Step
         long FirstffCount = countFFgrades(student);
 
+        System.out.println("FirstffCount: " + FirstffCount);
+
         if (FirstffCount == 1) {
             Boolean flag = hasFailedTableCourseWithoutRetake(student);
             if (flag) {
@@ -373,6 +375,17 @@ public class EligibilityChecker {
                             : currentBestGrade);
         }
 
+        // check if student got additional exams and used them and get new grades
+        if (student.additionalExams != null && student.additionalExams.size() > 0) {
+            for (AdditionalExam exam : student.additionalExams) {
+                bestGrades.compute(exam.code,
+                        (key, currentBestGrade) -> currentBestGrade == null
+                                || isHigherGrade(exam.grade, currentBestGrade)
+                                        ? exam.grade
+                                        : currentBestGrade);
+            }
+        }
+
         long failingGradesCount = bestGrades.values().stream()
                 .filter(grade -> grade.equals("FF") || grade.equals("FA"))
                 .count();
@@ -392,7 +405,15 @@ public class EligibilityChecker {
                             ? course.grade
                             : currentBestGrade);
         }
-
+        if (student.additionalExams != null && student.additionalExams.size() > 0) {
+            for (AdditionalExam exam : student.additionalExams) {
+                bestGrades.compute(exam.code,
+                        (key, currentBestGrade) -> currentBestGrade == null
+                                || isHigherGrade(exam.grade, currentBestGrade)
+                                        ? exam.grade
+                                        : currentBestGrade);
+            }
+        }
         long failingGradesCount = bestGrades.values().stream()
                 .filter(grade -> grade.equals("FF") || grade.equals("FA"))
                 .count();
@@ -518,6 +539,11 @@ public class EligibilityChecker {
         }
 
         double currentCGPA = totalCredits > 0 ? totalGradePoints / totalCredits : 0.0;
+
+        System.out.println("Current CGPA: " + currentCGPA);
+        System.out.println("Total Credits: " + totalCredits);
+        System.out.println("Total Grade Points: " + totalGradePoints);
+        System.out.println("Student CGPA: " + student.cgpa);
 
         if (student.cgpa < currentCGPA) {
             currentCGPA = student.cgpa;

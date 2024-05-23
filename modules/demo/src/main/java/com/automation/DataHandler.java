@@ -16,7 +16,13 @@ public class DataHandler {
     // pattern for CGPA: 2.73 GPA: 3.79
     private static final Pattern CGPA_PATTERN = Pattern.compile("^CGPA:\\s*(\\d+\\.\\d+)\\s*GPA:\\s*(\\d+\\.\\d+)$",
             Pattern.MULTILINE);
-    private static boolean isMoreThanSevenYears;
+    private static final Pattern ADDITIONAL_EXAMS_PATTERN = Pattern.compile(
+            "ADDITIONAL EXAMS\\s+Code\\s+Name\\s+Dates\\s+Credits/ECTS\\s+Grade\\s+Total Credits\\s+([\\s\\S]+?)(?=\\n{2}|\\Z)");
+
+    private static final Pattern ADDITIONAL_EXAM_PATTERN = Pattern.compile(
+            "(\\w{3}\\s\\d{3})\\s+([^\\d]+?)\\s+(\\d{2}\\s\\w{3}\\s\\d{4})\\s+(\\d+)\\s/\\s(\\d+)\\s([A-Z]{1,2}\\s?\\(R\\))\\s+NaN");
+
+    private static boolean isMoreThanSevenYears = false;
 
     public static Student getStudent(String transcript) {
 
@@ -56,10 +62,14 @@ public class DataHandler {
                 completedCredits += semester.completedCredits;
             }
 
+            List<AdditionalExam> additionalExams = parseAdditionalExams(transcript);
+
+            System.out.println("Additional Exams: " + additionalExams);
+
             return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses,
                     isMoreThanSevenYears, true,
                     false,
-                    false, countSemester(semesters), Integer.parseInt(totalCredits));
+                    false, countSemester(semesters), Integer.parseInt(totalCredits), additionalExams);
 
         } else {
         }
@@ -72,8 +82,7 @@ public class DataHandler {
         Matcher semesterMatcher = SEMESTER_PATTERN.matcher(transcript);
         while (semesterMatcher.find()) {
             int start = semesterMatcher.start();
-            // Adjust how you find 'end' if needed to ensure it accurately captures the
-            // section's end
+
             int end = transcript.indexOf("CGPA:", start) + 1;
             end = end > 0 ? transcript.indexOf("20", end) : transcript.length();
             if (end == -1)
@@ -90,7 +99,7 @@ public class DataHandler {
                 semester.gpa = detailsMatcher.group(2);
                 semester.completedCredits = Integer.parseInt(detailsMatcher.group(3));
                 semester.totalCredits = Integer.parseInt(detailsMatcher.group(4));
-            } else if (cgpaMatcher.find()) { // Ensure this comes after checking detailsMatcher to avoid missing details
+            } else if (cgpaMatcher.find()) {
                 semester.cgpa = cgpaMatcher.group(1);
                 semester.gpa = cgpaMatcher.group(2);
 
@@ -100,6 +109,26 @@ public class DataHandler {
             semesters.add(semester);
         }
         return semesters;
+    }
+
+    public static List<AdditionalExam> parseAdditionalExams(String transcript) {
+        List<AdditionalExam> additionalExams = new ArrayList<>();
+        Matcher additionalExamsMatcher = ADDITIONAL_EXAMS_PATTERN.matcher(transcript);
+        if (additionalExamsMatcher.find()) {
+            String additionalExamsSection = additionalExamsMatcher.group(1).trim();
+            Matcher additionalExamMatcher = ADDITIONAL_EXAM_PATTERN.matcher(additionalExamsSection);
+            while (additionalExamMatcher.find()) {
+                String code = additionalExamMatcher.group(1);
+                String name = additionalExamMatcher.group(2).trim();
+                String date = additionalExamMatcher.group(3).trim();
+                int credits = Integer.parseInt(additionalExamMatcher.group(4));
+                int ects = Integer.parseInt(additionalExamMatcher.group(5));
+                String grade = additionalExamMatcher.group(6).trim();
+
+                additionalExams.add(new AdditionalExam(code, name, date, credits, ects, grade));
+            }
+        }
+        return additionalExams;
     }
 
     // count semerster number excluding summer

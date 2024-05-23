@@ -253,6 +253,9 @@ public class GUI1 extends JFrame {
 
             String transcript = PdfParser.extractTextFromPDF(selectedFile.getAbsolutePath());
 
+            // Print transcript with line characters
+            System.out.println("Transcript:");
+
             // Get student from transcript (replace with your logic)
             Student student = DataHandler.getStudent(transcript);
 
