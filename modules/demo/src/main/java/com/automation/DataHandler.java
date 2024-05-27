@@ -65,11 +65,12 @@ public class DataHandler {
             List<AdditionalExam> additionalExams = parseAdditionalExams(transcript);
 
             System.out.println("Additional Exams: " + additionalExams);
+            int semestersCount = countSemester(semesters);
 
             return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses,
                     isMoreThanSevenYears, true,
                     false,
-                    false, countSemester(semesters), Integer.parseInt(totalCredits), additionalExams);
+                    false, semestersCount, Integer.parseInt(totalCredits), additionalExams);
 
         } else {
         }
@@ -168,6 +169,8 @@ public class DataHandler {
         // Check if the duration between the first and last semester is more than 7
         // years
         isMoreThanSevenYears = (lastYear - firstYear + 1) > 7;
+
+        System.out.println("Is More Than Seven Years: " + isMoreThanSevenYears);
 
         return count;
     }

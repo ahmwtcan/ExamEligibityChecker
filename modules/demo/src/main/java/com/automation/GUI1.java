@@ -255,9 +255,13 @@ public class GUI1 extends JFrame {
 
             // Print transcript with line characters
             System.out.println("Transcript:");
+            System.out.println(transcript);
+            System.out.println();
 
             // Get student from transcript (replace with your logic)
             Student student = DataHandler.getStudent(transcript);
+
+            System.out.println(student);
 
             // iff student is null, show error message
             if (student == null) {

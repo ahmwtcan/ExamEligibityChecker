@@ -3,8 +3,10 @@ package com.automation;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.automation.PdfParser.TableCourse;
@@ -15,7 +17,7 @@ public class EligibilityChecker {
     int maxStudyDuration = 14;
     int maxFFCount = 5;
     int maxWLCount = 5;
-    int minFFCount = 1;
+    int minFFCount = 0;
     int minWLCount = 1;
     private List<String> nonContributingGrades = List.of("W", "L", "I", "X", "T", "ND", "ADD", "DR", "AU");
     private static final Pattern NON_CONTRIBUTING_PATTERN = Pattern.compile("NC\\([A-Z]+\\)");
@@ -37,6 +39,11 @@ public class EligibilityChecker {
                 return process;
             }
             long ffCount = countFFgrades(student);
+
+            boolean hasFF = checkFFgrades(student, maxFFCount, minFFCount);
+
+            System.out.println("FF Count: " + ffCount);
+            System.out.println("Has FF: " + hasFF);
 
             if (student.gotExamRight) {
                 if (!student.gotExamRightAndUsed) {
@@ -95,6 +102,9 @@ public class EligibilityChecker {
         // 2.Step
         // if student has a W OR L Grade in any course beside creditless Language
         // courses, return false
+
+        System.out.println("Check Withdrawals and Leaves: " + countFFgrades(student));
+
         if (!checkWithdrawalsAndLeaves(student)) {
             process.WorLflag = true;
             process.examRight = ExamRight.HAK_YOK;
@@ -206,6 +216,11 @@ public class EligibilityChecker {
     }
 
     boolean checkMaxStudyDuration(Student student, int threshold) {
+
+        if (student.maxStudyDurationExceeded) {
+            process.message += "Student has already exceeded the study duration threshold " + threshold + "\n";
+            return true;
+        }
 
         if (student.semesterCount >= threshold) {
             student.maxStudyDurationExceeded = true;
@@ -367,30 +382,83 @@ public class EligibilityChecker {
 
     public boolean checkFFgrades(Student student, int maxFFCount, int minFFCount) {
         Map<String, String> bestGrades = new HashMap<>();
+        Set<String> failingElectives = new HashSet<>();
+        Map<String, String> poolMap = new HashMap<>();
 
+        // First pass to collect the best grades and identify failing electives
         for (Course course : student.courses) {
-            bestGrades.compute(course.code,
-                    (key, currentBestGrade) -> currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)
-                            ? course.grade
-                            : currentBestGrade);
-        }
+            boolean isFirstAttempt = student.courses.stream()
+                    .filter(c -> c.code.equals(course.code))
+                    .findFirst().get().equals(course);
 
-        // check if student got additional exams and used them and get new grades
-        if (student.additionalExams != null && student.additionalExams.size() > 0) {
-            for (AdditionalExam exam : student.additionalExams) {
-                bestGrades.compute(exam.code,
+            if (isElectiveCourse(course.code) && !isInternshipCourse(course.code)) {
+                System.out.println("Elective course: " + course.code + " Grade: " + course.grade + " isFirstAttempt: "
+                        + isFirstAttempt);
+
+                if (isFirstAttempt && course.grade.contains("(R)")) {
+                    // This course is a retake for a previously failed elective course
+                    poolMap.put(course.code, course.grade);
+                } else if (course.grade.startsWith("FF") || course.grade.startsWith("FA")) {
+                    failingElectives.add(course.code);
+                }
+                bestGrades.compute(course.code,
                         (key, currentBestGrade) -> currentBestGrade == null
-                                || isHigherGrade(exam.grade, currentBestGrade)
-                                        ? exam.grade
+                                || isHigherGrade(course.grade, currentBestGrade)
+                                        ? course.grade
+                                        : currentBestGrade);
+            } else if (!isInternshipCourse(course.code)) {
+                bestGrades.compute(course.code,
+                        (key, currentBestGrade) -> currentBestGrade == null
+                                || isHigherGrade(course.grade, currentBestGrade)
+                                        ? course.grade
                                         : currentBestGrade);
             }
         }
 
-        long failingGradesCount = bestGrades.values().stream()
-                .filter(grade -> grade.equals("FF") || grade.equals("FA"))
-                .count();
+        // Collect keys to be removed
+        List<String> keysToRemove = new ArrayList<>();
+        for (Map.Entry<String, String> entry : poolMap.entrySet()) {
+            System.out.println("Checking replacement course: " + entry.getKey());
 
-        process.message += "Student has " + failingGradesCount + " courses with FF or FA grades" + "\n";
+            boolean hasPassingGrade = bestGrades.entrySet().stream()
+                    .anyMatch(e -> !e.getKey().equals(entry.getKey()) && !e.getValue().startsWith("FF")
+                            && !e.getValue().startsWith("FA") && poolMap.containsKey(e.getKey()));
+            if (!hasPassingGrade) {
+                keysToRemove.add(entry.getKey());
+            }
+        }
+
+        // Remove keys after iteration
+        for (String key : keysToRemove) {
+            poolMap.remove(key);
+        }
+
+        // Calculate the final failing grades set
+        Set<String> finalFailedCourses = new HashSet<>(failingElectives);
+        for (String courseCode : failingElectives) {
+            if (poolMap.containsKey(courseCode) && isElectiveCourse(courseCode)) {
+                finalFailedCourses.remove(courseCode);
+            }
+        }
+
+        // Log best grades
+        for (Map.Entry<String, String> entry : bestGrades.entrySet()) {
+            System.out.println("Course code: " + entry.getKey() + " Grade: " + entry.getValue());
+        }
+
+        // Log final failing grades count
+        System.out.println("Final failing grades count: " + (finalFailedCourses.size() - poolMap.size()));
+
+        // Log failed courses
+        for (String courseCode : finalFailedCourses) {
+            System.out.println("Failed course code: " + courseCode);
+        }
+
+        long failingGradesCount = finalFailedCourses.size() - poolMap.size();
+
+        System.out.println("FFFFFFFFFFFFFFF grades count: " + failingGradesCount);
+
+        process.message += "Student has " + failingGradesCount + " failing grades " + "\n";
 
         // Check if the count of failing grades is within the specified range
         return (failingGradesCount > minFFCount && failingGradesCount <= maxFFCount);
@@ -398,27 +466,87 @@ public class EligibilityChecker {
 
     public long countFFgrades(Student student) {
         Map<String, String> bestGrades = new HashMap<>();
+        Set<String> failingElectives = new HashSet<>();
+        Map<String, String> poolMap = new HashMap<>();
 
+        // First pass to collect the best grades and identify failing electives
         for (Course course : student.courses) {
-            bestGrades.compute(course.code,
-                    (key, currentBestGrade) -> currentBestGrade == null || isHigherGrade(course.grade, currentBestGrade)
-                            ? course.grade
-                            : currentBestGrade);
-        }
-        if (student.additionalExams != null && student.additionalExams.size() > 0) {
-            for (AdditionalExam exam : student.additionalExams) {
-                bestGrades.compute(exam.code,
+            boolean isFirstAttempt = student.courses.stream()
+                    .filter(c -> c.code.equals(course.code))
+                    .findFirst().get().equals(course);
+
+            if (isElectiveCourse(course.code) && !isInternshipCourse(course.code)) {
+                System.out.println("Elective course: " + course.code + " Grade: " + course.grade + " isFirstAttempt: "
+                        + isFirstAttempt);
+
+                if (isFirstAttempt && course.grade.contains("(R)")) {
+                    // This course is a retake for a previously failed elective course
+                    poolMap.put(course.code, course.grade);
+                } else if (course.grade.startsWith("FF") || course.grade.startsWith("FA")) {
+                    failingElectives.add(course.code);
+                }
+                bestGrades.compute(course.code,
                         (key, currentBestGrade) -> currentBestGrade == null
-                                || isHigherGrade(exam.grade, currentBestGrade)
-                                        ? exam.grade
+                                || isHigherGrade(course.grade, currentBestGrade)
+                                        ? course.grade
+                                        : currentBestGrade);
+            } else if (!isInternshipCourse(course.code)) {
+                bestGrades.compute(course.code,
+                        (key, currentBestGrade) -> currentBestGrade == null
+                                || isHigherGrade(course.grade, currentBestGrade)
+                                        ? course.grade
                                         : currentBestGrade);
             }
         }
-        long failingGradesCount = bestGrades.values().stream()
-                .filter(grade -> grade.equals("FF") || grade.equals("FA"))
-                .count();
 
-        return failingGradesCount;
+        // Collect keys to be removed
+        List<String> keysToRemove = new ArrayList<>();
+        for (Map.Entry<String, String> entry : poolMap.entrySet()) {
+            System.out.println("Checking replacement course: " + entry.getKey());
+
+            boolean hasPassingGrade = bestGrades.entrySet().stream()
+                    .anyMatch(e -> !e.getKey().equals(entry.getKey()) && !e.getValue().startsWith("FF")
+                            && !e.getValue().startsWith("FA") && poolMap.containsKey(e.getKey()));
+            if (!hasPassingGrade) {
+                keysToRemove.add(entry.getKey());
+            }
+        }
+
+        // Remove keys after iteration
+        for (String key : keysToRemove) {
+            poolMap.remove(key);
+        }
+
+        // Calculate the final failing grades set
+        Set<String> finalFailedCourses = new HashSet<>(failingElectives);
+        for (String courseCode : failingElectives) {
+            if (poolMap.containsKey(courseCode) && isElectiveCourse(courseCode)) {
+                finalFailedCourses.remove(courseCode);
+            }
+        }
+
+        // Log best grades
+        for (Map.Entry<String, String> entry : bestGrades.entrySet()) {
+            System.out.println("Course code: " + entry.getKey() + " Grade: " + entry.getValue());
+        }
+
+        // Log final failing grades count
+        System.out.println("Final failing grades count: " + (finalFailedCourses.size() - poolMap.size()));
+
+        // Log failed courses
+        for (String courseCode : finalFailedCourses) {
+            System.out.println("Failed course code: " + courseCode);
+        }
+
+        return finalFailedCourses.size() - poolMap.size();
+    }
+
+    private boolean isInternshipCourse(String code) {
+        return code.matches("[A-Z]{2,3} 400");
+    }
+
+    private boolean isElectiveCourse(String courseCode) {
+        return courseCode.matches("[A-Z]{2,3} [4-9][0-9]{2}");
     }
 
     public boolean checkWorLgrades(Student student, int maxWLCount, int minWLCount) {
@@ -480,13 +608,17 @@ public class EligibilityChecker {
     }
 
     private boolean isHigherGrade(String newGrade, String oldGrade) {
+        // Normalize grades by removing "(R)" if present
+        String normalizedNewGrade = newGrade.replaceAll("\\(R\\)", "").trim();
+        String normalizedOldGrade = oldGrade.replaceAll("\\(R\\)", "").trim();
+
         // The order of grades from best to worst, with 'AA' being the best and 'FF' and
         // 'FA' both being failing grades.
-        List<String> gradesOrder = List.of("AA", "BA", "BB", "CB", "CC", "DC", "DD", "FD", "FF", "FA");
+        List<String> gradesOrder = List.of("AA", "BA", "BB", "CB", "CC", "DC", "DD", "FD", "FF", "FA", "W");
 
         // If the new grade comes before the old grade in this list, it's higher
         // (better).
-        return gradesOrder.indexOf(newGrade) < gradesOrder.indexOf(oldGrade);
+        return gradesOrder.indexOf(normalizedNewGrade) < gradesOrder.indexOf(normalizedOldGrade);
     }
 
     public boolean checkGPA(Student student, double requiredGPA) {

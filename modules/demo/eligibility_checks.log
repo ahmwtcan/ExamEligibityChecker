@@ -8,3 +8,18 @@ Student No: 1, Semester Number: 15, Course Number: 103
 Duration: 6 ms
 Result: SINAV
 
+Thu May 23 20:28:16 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 9, Course Number: 57
+Duration: 641 tenths of ms
+Result: EK_SINAV
+
+Thu May 23 20:33:45 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 9, Course Number: 57
+Duration: 331 tenths of ms
+Result: EK_SINAV
+
+Thu May 23 20:34:42 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 9, Course Number: 57
+Duration: 680 tenths of ms
+Result: EK_SINAV
+
