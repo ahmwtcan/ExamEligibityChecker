@@ -20,7 +20,7 @@ public class DataHandler {
             "ADDITIONAL EXAMS\\s+Code\\s+Name\\s+Dates\\s+Credits/ECTS\\s+Grade\\s+Total Credits\\s+([\\s\\S]+?)(?=\\n{2}|\\Z)");
 
     private static final Pattern ADDITIONAL_EXAM_PATTERN = Pattern.compile(
-            "(\\w{3}\\s\\d{3})\\s+([^\\d]+?)\\s+(\\d{2}\\s\\w{3}\\s\\d{4})\\s+(\\d+)\\s/\\s(\\d+)\\s([A-Z]{1,2}\\s?\\(R\\))\\s+NaN");
+            "([A-Z]+\\s\\d{3})\\s+([^\\d]+?)\\s+(\\d{2}\\s\\w{3}\\s\\d{4})\\s+(\\d+)\\s/\\s(\\d+)\\s([A-Z]{1,2}\\s?\\(R\\))\\s+NaN");
 
     private static boolean isMoreThanSevenYears = false;
 
@@ -41,33 +41,29 @@ public class DataHandler {
                     .compile("Completed\\/Total\\s*Credits\\s*(?:\\b|\\s)?(\\d+)\\s*(?:\\/|\\s)?(\\d+)\\s*");
 
             Matcher totalCreditsMatcher = totalCreditsPattern.matcher(transcript);
-            @SuppressWarnings("unused")
             String cCredits = "";
             String totalCredits = "";
             if (totalCreditsMatcher.find()) {
                 cCredits = totalCreditsMatcher.group(1);
                 totalCredits = totalCreditsMatcher.group(2);
             }
+
+            System.out.println("Total Credits: " + totalCredits);
+            System.out.println("Completed Credits: " + cCredits);
             List<Semester> semesters = parseTranscript(transcript);
 
             List<Course> courses = new ArrayList<>();
             for (Semester semester : semesters) {
                 courses.addAll(semester.courses);
             }
-
-            // copleted credits and cgpa
-            int completedCredits = 0;
             double currentCGPA = Double.parseDouble(semesters.get(semesters.size() - 1).cgpa);
-            for (Semester semester : semesters) {
-                completedCredits += semester.completedCredits;
-            }
 
             List<AdditionalExam> additionalExams = parseAdditionalExams(transcript);
 
             System.out.println("Additional Exams: " + additionalExams);
             int semestersCount = countSemester(semesters);
 
-            return new Student(name, studentNumber, completedCredits, currentCGPA, semesters, courses,
+            return new Student(name, studentNumber, Integer.parseInt(cCredits), currentCGPA, semesters, courses,
                     isMoreThanSevenYears, true,
                     false,
                     false, semestersCount, Integer.parseInt(totalCredits), additionalExams);

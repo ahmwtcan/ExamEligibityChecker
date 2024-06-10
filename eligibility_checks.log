@@ -1,258 +1,3 @@
-Wed May 15 19:10:51 TRT 2024 - Configured Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 10 ms
-Result: ILISIGI_KESILDI
-
-Wed May 15 19:10:52 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 9 ms
-Result: HAK_YOK
-
-Wed May 15 19:19:44 TRT 2024 - Configured Eligibility Check
-Student Name: Mr. EREN YILDIZ, Semester Number: 15, Course Number: 103
-Duration: 30 ms
-Result: EK_SINAV
-
-Wed May 15 19:19:46 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. EREN YILDIZ, Semester Number: 15, Course Number: 103
-Duration: 5 ms
-Result: SINAV
-
-Wed May 15 19:21:42 TRT 2024 - Configured Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 30 ms
-Result: SINIRSIZ_SINAV
-
-Wed May 15 19:21:43 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 34 ms
-Result: HAK_YOK
-
-Wed May 15 19:23:29 TRT 2024 - Configured Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 23 ms
-Result: SINIRSIZ_SINAV
-
-Wed May 15 19:23:30 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 12 ms
-Result: HAK_YOK
-
-Wed May 15 19:25:30 TRT 2024 - Configured Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 22 ms
-Result: HAK_YOK
-
-Wed May 15 19:25:32 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 14 ms
-Result: HAK_YOK
-
-Wed May 15 19:35:17 TRT 2024 - Legacy Eligibility Check
-Student Name: Mr. AHMET CAN AVŞAR, Semester Number: 7, Course Number: 42
-Duration: 4 ms
-Result: HAK_YOK
-
-Fri May 17 15:42:53 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 37 ms
-Result: SINAV
-
-Fri May 17 18:46:59 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 7, Course Number: 42
-Duration: 10 ms
-Result: HAK_YOK
-
-Mon May 20 01:02:23 TRT 2024 - Configured Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 16 ms
-Result: SINAV
-
-Mon May 20 01:02:24 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 12 ms
-Result: SINAV
-
-Mon May 20 01:03:11 TRT 2024 - Configured Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 42
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:03:12 TRT 2024 - Legacy Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 42
-Duration: 20 ms
-Result: HAK_YOK
-
-Mon May 20 01:03:36 TRT 2024 - Configured Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 34
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:03:37 TRT 2024 - Legacy Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 34
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:03:48 TRT 2024 - Configured Eligibility Check
-Student No: 4, Semester Number: 7, Course Number: 44
-Duration: 15 ms
-Result: HAK_YOK
-
-Mon May 20 01:03:50 TRT 2024 - Legacy Eligibility Check
-Student No: 4, Semester Number: 7, Course Number: 44
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:09 TRT 2024 - Configured Eligibility Check
-Student No: 1, Semester Number: 7, Course Number: 34
-Duration: 11 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:11 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 7, Course Number: 34
-Duration: 3 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:16 TRT 2024 - Configured Eligibility Check
-Student No: 2, Semester Number: 15, Course Number: 103
-Duration: 4 ms
-Result: SINAV
-
-Mon May 20 01:10:17 TRT 2024 - Legacy Eligibility Check
-Student No: 2, Semester Number: 15, Course Number: 103
-Duration: 4 ms
-Result: SINAV
-
-Mon May 20 01:10:22 TRT 2024 - Configured Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:24 TRT 2024 - Legacy Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:29 TRT 2024 - Configured Eligibility Check
-Student No: 4, Semester Number: 7, Course Number: 44
-Duration: 2 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:31 TRT 2024 - Legacy Eligibility Check
-Student No: 4, Semester Number: 7, Course Number: 44
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:36 TRT 2024 - Configured Eligibility Check
-Student No: 5, Semester Number: 6, Course Number: 36
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:10:38 TRT 2024 - Legacy Eligibility Check
-Student No: 5, Semester Number: 6, Course Number: 36
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:05 TRT 2024 - Configured Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 21 ms
-Result: SINAV
-
-Mon May 20 01:14:06 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 8 ms
-Result: SINAV
-
-Mon May 20 01:14:13 TRT 2024 - Configured Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 44
-Duration: 6 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:15 TRT 2024 - Legacy Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 44
-Duration: 2 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:20 TRT 2024 - Configured Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:22 TRT 2024 - Legacy Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:41 TRT 2024 - Configured Eligibility Check
-Student No: 4, Semester Number: 6, Course Number: 36
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:14:42 TRT 2024 - Legacy Eligibility Check
-Student No: 4, Semester Number: 6, Course Number: 36
-Duration: 0 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:09 TRT 2024 - Configured Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 8 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:11 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 17 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:19 TRT 2024 - Configured Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 44
-Duration: 3 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:21 TRT 2024 - Legacy Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 44
-Duration: 2 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:32 TRT 2024 - Configured Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:16:34 TRT 2024 - Legacy Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 42
-Duration: 1 ms
-Result: HAK_YOK
-
-Mon May 20 01:17:21 TRT 2024 - Legacy Eligibility Check
-Student No: 1, Semester Number: 15, Course Number: 103
-Duration: 189 ms
-Result: HAK_YOK
-
-Mon May 20 01:17:43 TRT 2024 - Legacy Eligibility Check
-Student No: 2, Semester Number: 7, Course Number: 42
-Duration: 28 ms
-Result: HAK_YOK
-
-Mon May 20 01:17:51 TRT 2024 - Legacy Eligibility Check
-Student No: 3, Semester Number: 7, Course Number: 44
-Duration: 31 ms
-Result: HAK_YOK
-
-Mon May 20 01:18:01 TRT 2024 - Legacy Eligibility Check
-Student No: 4, Semester Number: 6, Course Number: 36
-Duration: 5 ms
-Result: HAK_YOK
-
-Mon May 20 01:18:07 TRT 2024 - Legacy Eligibility Check
-Student No: 5, Semester Number: 7, Course Number: 42
-Duration: 11 ms
-Result: HAK_YOK
-
-Mon May 20 01:18:13 TRT 2024 - Legacy Eligibility Check
-Student No: 6, Semester Number: 15, Course Number: 103
-Duration: 25 ms
-Result: SINAV
-
 Mon May 20 13:41:51 TRT 2024 - Configured Eligibility Check
 Student No: 1, Semester Number: 15, Course Number: 103
 Duration: 82 tenths of ms
@@ -637,4 +382,589 @@ Mon May 27 08:59:12 TRT 2024 - Legacy Eligibility Check
 Student No: 4, Semester Number: 16, Course Number: 111
 Duration: 468 tenths of ms
 Result: SINAV
+
+Tue May 28 19:07:19 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 14, Course Number: 100
+Duration: 1637 tenths of ms
+Result: SINAV
+
+Tue May 28 19:10:13 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 21, Course Number: 116
+Duration: 1253 tenths of ms
+Result: SINAV
+
+Tue May 28 19:14:46 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 1104 tenths of ms
+Result: SINAV
+
+Tue May 28 19:17:23 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 800 tenths of ms
+Result: SINAV
+
+Tue May 28 19:29:03 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 756 tenths of ms
+Result: SINAV
+
+Tue May 28 19:30:36 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 682 tenths of ms
+Result: SINAV
+
+Tue May 28 19:34:37 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 905 tenths of ms
+Result: SINAV
+
+Tue May 28 19:36:49 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 571 tenths of ms
+Result: SINAV
+
+Tue May 28 19:56:00 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 506 tenths of ms
+Result: SINAV
+
+Tue May 28 19:58:38 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 403 tenths of ms
+Result: SINAV
+
+Tue May 28 20:01:44 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 441 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:04:35 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 387 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:08:16 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 384 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:10:56 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 489 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:16:04 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 315 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:16:54 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 682 tenths of ms
+Result: SINAV
+
+Tue May 28 20:17:48 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 891 tenths of ms
+Result: SINAV
+
+Tue May 28 20:18:46 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 540 tenths of ms
+Result: SINAV
+
+Tue May 28 20:22:49 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 581 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:43:19 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 414 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 20:52:42 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 357 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:02:54 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 277 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:04:35 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 333 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:11:28 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 404 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:17:20 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 341 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:18:19 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 282 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:28:43 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 263 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:30:10 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 388 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:41:49 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 385 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:45:08 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 573 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 21:46:50 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 453 tenths of ms
+Result: SINAV
+
+Tue May 28 21:48:34 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 335 tenths of ms
+Result: SINAV
+
+Tue May 28 21:53:56 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 433 tenths of ms
+Result: SINAV
+
+Tue May 28 21:57:51 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 573 tenths of ms
+Result: SINAV
+
+Tue May 28 21:59:22 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 462 tenths of ms
+Result: SINAV
+
+Tue May 28 22:12:51 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 328 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 22:25:42 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 481 tenths of ms
+Result: SINAV
+
+Tue May 28 22:29:10 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 485 tenths of ms
+Result: SINAV
+
+Tue May 28 22:32:36 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 614 tenths of ms
+Result: SINAV
+
+Tue May 28 22:37:29 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 449 tenths of ms
+Result: SINAV
+
+Tue May 28 22:39:14 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 600 tenths of ms
+Result: SINAV
+
+Tue May 28 22:42:44 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 331 tenths of ms
+Result: SINAV
+
+Tue May 28 22:52:24 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 7, Course Number: 42
+Duration: 220 tenths of ms
+Result: HAK_YOK
+
+Tue May 28 22:52:55 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 15, Course Number: 95
+Duration: 493 tenths of ms
+Result: EK_SINAV
+
+Tue May 28 22:55:45 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 706 tenths of ms
+Result: SINAV
+
+Tue May 28 23:26:46 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 698 tenths of ms
+Result: SINAV
+
+Tue May 28 23:29:53 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 780 tenths of ms
+Result: SINAV
+
+Tue May 28 23:34:05 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 428 tenths of ms
+Result: SINAV
+
+Tue May 28 23:40:37 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 507 tenths of ms
+Result: SINAV
+
+Tue May 28 23:42:03 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 474 tenths of ms
+Result: SINAV
+
+Tue May 28 23:51:55 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 428 tenths of ms
+Result: SINAV
+
+Tue May 28 23:53:01 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 482 tenths of ms
+Result: SINAV
+
+Tue May 28 23:54:23 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 598 tenths of ms
+Result: SINAV
+
+Tue May 28 23:55:06 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 454 tenths of ms
+Result: SINAV
+
+Tue May 28 23:55:51 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 531 tenths of ms
+Result: SINAV
+
+Tue May 28 23:56:38 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 461 tenths of ms
+Result: SINAV
+
+Tue May 28 23:57:47 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 472 tenths of ms
+Result: SINAV
+
+Tue May 28 23:58:24 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 436 tenths of ms
+Result: SINAV
+
+Wed May 29 00:01:32 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 517 tenths of ms
+Result: SINAV
+
+Wed May 29 00:07:56 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 7, Course Number: 42
+Duration: 255 tenths of ms
+Result: HAK_YOK
+
+Wed May 29 00:08:20 TRT 2024 - Legacy Eligibility Check
+Student No: 3, Semester Number: 7, Course Number: 44
+Duration: 114 tenths of ms
+Result: HAK_YOK
+
+Wed May 29 00:08:31 TRT 2024 - Legacy Eligibility Check
+Student No: 4, Semester Number: 15, Course Number: 95
+Duration: 329 tenths of ms
+Result: SINAV
+
+Wed May 29 00:17:48 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 95
+Duration: 606 tenths of ms
+Result: SINAV
+
+Wed May 29 00:20:19 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 95
+Duration: 616 tenths of ms
+Result: SINAV
+
+Wed May 29 00:25:58 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 507 tenths of ms
+Result: SINAV
+
+Wed May 29 00:26:11 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 15, Course Number: 95
+Duration: 488 tenths of ms
+Result: SINAV
+
+Wed May 29 21:13:11 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 531 tenths of ms
+Result: SINAV
+
+Wed May 29 21:13:23 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 14, Course Number: 100
+Duration: 372 tenths of ms
+Result: SINAV
+
+Wed May 29 21:14:23 TRT 2024 - Legacy Eligibility Check
+Student No: 3, Semester Number: 21, Course Number: 116
+Duration: 367 tenths of ms
+Result: SINAV
+
+Wed May 29 21:15:00 TRT 2024 - Legacy Eligibility Check
+Student No: 4, Semester Number: 15, Course Number: 95
+Duration: 294 tenths of ms
+Result: SINAV
+
+Wed May 29 21:20:38 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 977 tenths of ms
+Result: SINAV
+
+Wed May 29 21:25:39 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 535 tenths of ms
+Result: SINAV
+
+Wed May 29 21:26:52 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 351 tenths of ms
+Result: SINAV
+
+Wed May 29 21:31:41 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 456 tenths of ms
+Result: SINAV
+
+Wed May 29 21:33:08 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 406 tenths of ms
+Result: SINAV
+
+Wed May 29 21:34:26 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 305 tenths of ms
+Result: SINAV
+
+Wed May 29 21:37:50 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 284 tenths of ms
+Result: SINAV
+
+Wed May 29 21:39:18 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 392 tenths of ms
+Result: SINAV
+
+Wed May 29 21:40:08 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 300 tenths of ms
+Result: SINAV
+
+Wed May 29 21:43:06 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 344 tenths of ms
+Result: SINAV
+
+Wed May 29 21:49:59 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 356 tenths of ms
+Result: SINAV
+
+Wed May 29 21:52:21 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 362 tenths of ms
+Result: SINAV
+
+Wed May 29 21:54:24 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 362 tenths of ms
+Result: SINAV
+
+Wed May 29 21:56:40 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 310 tenths of ms
+Result: SINAV
+
+Wed May 29 21:58:13 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 248 tenths of ms
+Result: SINAV
+
+Wed May 29 21:59:27 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 378 tenths of ms
+Result: SINAV
+
+Wed May 29 22:00:33 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 14, Course Number: 100
+Duration: 183 tenths of ms
+Result: SINAV
+
+Wed May 29 22:01:20 TRT 2024 - Legacy Eligibility Check
+Student No: 3, Semester Number: 11, Course Number: 63
+Duration: 78 tenths of ms
+Result: SINAV
+
+Wed May 29 22:05:48 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 11, Course Number: 63
+Duration: 333 tenths of ms
+Result: SINAV
+
+Wed May 29 22:06:28 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 14, Course Number: 56
+Duration: 79 tenths of ms
+Result: SINAV
+
+Wed May 29 22:12:46 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 14, Course Number: 56
+Duration: 391 tenths of ms
+Result: SINAV
+
+Wed May 29 22:13:32 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 14, Course Number: 56
+Duration: 328 tenths of ms
+Result: SINAV
+
+Wed May 29 22:14:04 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 653 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:17:42 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 1247 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:19:37 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 747 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:20:27 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 1069 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:21:17 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 820 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:25:34 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 16, Course Number: 111
+Duration: 727 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:43:32 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 722 tenths of ms
+Result: SINAV
+
+Wed May 29 22:47:22 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 558 tenths of ms
+Result: SINAV
+
+Wed May 29 22:50:09 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 488 tenths of ms
+Result: SINAV
+
+Wed May 29 22:51:02 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 545 tenths of ms
+Result: SINAV
+
+Wed May 29 22:51:13 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 16, Course Number: 111
+Duration: 427 tenths of ms
+Result: EK_SINAV
+
+Wed May 29 22:51:38 TRT 2024 - Legacy Eligibility Check
+Student No: 3, Semester Number: 15, Course Number: 95
+Duration: 291 tenths of ms
+Result: SINAV
+
+Wed May 29 22:52:08 TRT 2024 - Legacy Eligibility Check
+Student No: 4, Semester Number: 14, Course Number: 56
+Duration: 154 tenths of ms
+Result: SINAV
+
+Wed May 29 22:55:19 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 14, Course Number: 56
+Duration: 341 tenths of ms
+Result: SINAV
+
+Mon Jun 10 22:00:55 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 745 tenths of ms
+Result: SINAV
+
+Mon Jun 10 22:05:37 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 705 tenths of ms
+Result: SINAV
+
+Mon Jun 10 22:06:44 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 616 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:08:57 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 739 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:12:03 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 1201 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:13:31 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 1308 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:15:23 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 15, Course Number: 103
+Duration: 255 tenths of ms
+Result: SINAV
+
+Mon Jun 10 22:15:38 TRT 2024 - Legacy Eligibility Check
+Student No: 3, Semester Number: 15, Course Number: 95
+Duration: 476 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:17:38 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 15, Course Number: 103
+Duration: 760 tenths of ms
+Result: SINAV
+
+Mon Jun 10 22:22:38 TRT 2024 - Legacy Eligibility Check
+Student No: 1, Semester Number: 21, Course Number: 116
+Duration: 1357 tenths of ms
+Result: SINIRSIZ_SINAV
+
+Mon Jun 10 22:24:20 TRT 2024 - Legacy Eligibility Check
+Student No: 2, Semester Number: 7, Course Number: 42
+Duration: 8 tenths of ms
+Result: HAK_YOK
 

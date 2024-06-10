@@ -15,6 +15,7 @@ public class Student {
     public boolean gotExamRight;
     public int semesterCount;
     public int totalCredits;
+
     List<AdditionalExam> additionalExams;
 
     // Gerekli getter ve setter metodları
