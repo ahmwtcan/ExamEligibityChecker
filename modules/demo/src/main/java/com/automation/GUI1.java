@@ -166,8 +166,8 @@ public class GUI1 extends JFrame {
         String aboutText = "<html><body><h1>Exam Eligibility Checker</h1>"
                 + "<p>This application checks if a student is eligible for the exam "
                 + "based on their academic transcript.</p>"
-                + "<p>Version: 1.0</p>"
-                + "<p>Author: fuzulia</p>"
+                + "<p>Legacy Version: V8 , 11.08.2023 </p>"
+                + "<p>Author: Ahmetcan AVŞAR (ahmetcan.avsar@std.yeditepe.edu.tr)</p>"
                 + "<p>© 2024 Yeditepe University</p>"
                 + "</body></html>";
 
@@ -190,6 +190,16 @@ public class GUI1 extends JFrame {
         logWindow.setSize(400, 300);
         logWindow.setLocationRelativeTo(this);
         logWindow.setVisible(true);
+
+        // close after 35 seconds
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        logWindow.dispose();
+                    }
+                },
+                35000);
     }
 
     private void showConfiguredLogWindow() {
@@ -206,6 +216,15 @@ public class GUI1 extends JFrame {
         logWindow.setSize(400, 300);
         logWindow.setLocationRelativeTo(this);
         logWindow.setVisible(true);
+        // close after 35 seconds
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        logWindow.dispose();
+                    }
+                },
+                35000);
     }
 
     private void uploadJsonAction(ActionEvent event) {
@@ -218,6 +237,12 @@ public class GUI1 extends JFrame {
             File selectedFile = fileChooser.getSelectedFile();
             try {
                 rulesJson = new String(Files.readAllBytes(selectedFile.toPath()));
+
+                // Pop up a message to show the user that the configuration is loaded
+
+                JOptionPane.showMessageDialog(this, "Configuration loaded successfully.", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+
                 configStatusLabel.setText("Configuration loaded: " + selectedFile.getName());
 
             } catch (Exception e) {
@@ -226,6 +251,7 @@ public class GUI1 extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -306,12 +332,13 @@ public class GUI1 extends JFrame {
             long ruleStartTime = System.nanoTime();
 
             String ruleResults = ruleInterpreter.evaluateRules(currentStudent);
+            System.out.println(ruleResults);
 
             String[] lines = ruleResults.split("\n");
             String finalDecision = lines[lines.length - 1].split(":")[1].trim();
             result = finalDecision;
 
-            configuredLogs = eligibilityChecker.process.message + "\n\n" + finalDecision;
+            configuredLogs = ruleResults + "\n\n" + finalDecision;
             long ruleEndTime = System.nanoTime();
 
             long ruleDuration = (ruleEndTime - ruleStartTime) / 100000;

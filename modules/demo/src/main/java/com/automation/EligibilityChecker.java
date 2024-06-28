@@ -27,29 +27,31 @@ public class EligibilityChecker {
     public EligibilityProcess checkEligibility(Student student) {
 
         process.message = "";
-        // Check the student's eligibility for the exam right
+        String causeResult; // Variable to hold cause and result information
 
+        // 1. Check the student's eligibility for the exam right
         checkMaxStudyDuration(student, maxStudyDuration);
-        // 1. Step
         if (student.maxStudyDurationExceeded) {
-            process.message += "Azami Öğretim Süresini doldurdum: EVET\n";
+            causeResult = "Exceeded Maximum Study Duration: YES. Continue from Article 9. IMPORTANT: To benefit from exam rights, you need to submit a petition.";
+            process.message += "Article 1: " + causeResult + "\n";
+
             if (hasExcessiveTotalFailures(student, 6)) {
                 process.tableCourseFlag = true;
                 process.examRight = ExamRight.ILISIGI_KESILDI;
-                process.message += "İlişiği kesildi: 5 taneden fazla FF veya FA notu\n";
+                process.message += "Relationship terminated: More than 5 FF or FA grades. Article 9.a\n";
                 return process;
             }
-            long ffCount = countFFgrades(student);
 
+            long ffCount = countFFgrades(student);
             if (student.gotExamRight) {
                 if (!student.gotExamRightAndUsed) {
                     process.examRight = ExamRight.HAK_YOK;
-                    process.message += "Sınav hakkı yok: Dilekçe verilmedi veya kullanılmadı\n";
+                    process.message += "No exam right: Petition not submitted or not used. Article 10.a\n";
                     return process;
                 } else if (process.gotExamRightAndUsed) {
                     if (ffCount > maxFFCount) {
                         process.examRight = ExamRight.ILISIGI_KESILDI;
-                        process.message += "İlişiği kesildi: 5'ten fazla FF notu\n";
+                        process.message += "Relationship terminated: More than 5 FF grades. Article 11.b\n";
                         return process;
                     }
                 }
@@ -58,126 +60,291 @@ public class EligibilityChecker {
             if (ffCount > 5) {
                 if (process.gotExamRightAndUsed) {
                     process.examRight = ExamRight.ILISIGI_KESILDI;
-                    process.message += "İlişiği kesildi: 5'ten fazla FF notu\n";
+                    process.message += "Relationship terminated: More than 5 FF grades. Article 9.a\n";
                     return process;
                 }
                 process.examRight = ExamRight.EK_SINAV;
-                process.message += "Ek sınav hakkı: 5'ten fazla FF notu\n";
+                process.message += "Additional exam right: More than 5 FF grades. Article 12.c\n";
                 process.FFgradeFlag = true;
                 return process;
             } else if (ffCount > 1 && ffCount <= 5) {
-                process.message += "Ek sınav hakkı: 1-5 arası FF notu\n";
+                process.message += "Additional exam right: 1-5 FF grades. Article 12.c\n";
                 process.FFgradeFlag = false;
                 process.examRight = ExamRight.SINAV;
                 return process;
             } else if (ffCount == 1) {
                 process.FFgradeFlag = false;
-                process.message += "Sınırsız sınav hakkı: 1 FF notu\n";
+                process.message += "Unlimited exam right: 1 FF grade. Article 12.a\n";
                 process.examRight = ExamRight.SINIRSIZ_SINAV;
                 return process;
             }
 
-            // check gpa
             process.GPAFlag = checkGPA(student, requiredGPA);
-
             if (!process.GPAFlag) {
                 canGradeImprovementRaiseCGPA(student, requiredGPA);
                 process.examRight = ExamRight.SINIRSIZ_SINAV;
-                process.message += "Sınırsız sınav hakkı: GPA düşük\n";
+                process.message += "Unlimited exam right: Low GPA. Article 13.a\n";
                 return process;
             } else if (!process.GPAFlag && !hasFailedTableCourseWithoutRetake(student)) {
                 process.examRight = ExamRight.SINIRSIZ_SINAV;
-                process.message += "Sınırsız sınav hakkı: GPA düşük ve failed table course without retake\n";
+                process.message += "Unlimited exam right: Low GPA and failed table course without retake. Article 12.a\n";
                 return process;
             }
         } else {
-            process.message += "Azami Öğretim Süresini doldurdum: HAYIR\n";
+            process.message += "Article 1: Exceeded Maximum Study Duration: NO. Continue from Article 2.\n";
         }
 
-        // 2. Step
+        // 2. Check Withdrawals and Leaves
         if (!checkWithdrawalsAndLeaves(student)) {
             process.WorLflag = true;
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "W veya L notu olan ders: Evet\n";
+            process.message += "Course with W or L grade: YES. Article 2.a\n";
             return process;
         } else {
             process.WorLflag = false;
-            process.message += "W veya L notu olan ders: Hayır\n";
+            process.message += "Course with W or L grade: NO. Continue from Article 3. Article 2.b\n";
         }
 
-        // 3. Step
+        // 3. Check Internship
         if (!checkInternship(student)) {
             process.internshipFlag = true;
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "Zorunlu staj tamamlanmadı\n";
+            process.message += "Compulsory internship not completed. Article 3.b\n";
             return process;
         } else {
             process.internshipFlag = false;
-            process.message += "Zorunlu staj tamamlandı\n";
+            process.message += "Compulsory internship completed. Continue from Article 4. Article 3.a\n";
         }
 
-        // 4. Step
+        // 4. Check All Courses Taken
         if (!student.isAllCoursesTaken) {
             process.allCoursesFlag = true;
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "Tüm dersler alınmamış\n";
+            process.message += "All courses not taken. Article 4.b\n";
             return process;
         } else {
             process.allCoursesFlag = false;
-            process.message += "Tüm dersler alınmış\n";
+            process.message += "All courses taken. Continue from Article 5. Article 4.a\n";
         }
 
         if (student.semesterCount < 9) {
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "Normal öğretim süresi tamamlanmadı\n";
+            process.message += "Normal study duration not completed. No right. Article 5.b\n";
             return process;
+        } else {
+            process.message += "Normal study duration completed. Continue from Article 6. Article 5.a\n";
         }
 
-        // 5. Step
+        // 5. Check FF Grades
         long FirstffCount = countFFgrades(student);
-
         if (FirstffCount == 1) {
             Boolean flag = hasFailedTableCourseWithoutRetake(student);
             if (flag) {
                 process.tableCourseFlag = true;
                 process.examRight = ExamRight.HAK_YOK;
-                process.message += "TABLO 1'de FF notu var\n";
+                process.message += "FF grade in TABLE 1. Article 6.a.i\n";
                 return process;
             }
             process.FFgradeFlag = false;
             process.examRight = ExamRight.EK_SINAV;
-            process.message += "Ek sınav hakkı: 1 FF notu\n";
+            process.message += "Additional exam right: 1 FF grade. Article 6.a.ii\n";
             return process;
         } else if (FirstffCount > 1) {
             process.FFgradeFlag = true;
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "Birden fazla FF notu\n";
+            process.message += "More than 1 FF grade. Article 6.b\n";
             return process;
         } else {
             process.FFgradeFlag = false;
-            process.message += "FF notu yok\n";
+            process.message += "No FF grades. Continue from Article 7. Article 6.c\n";
         }
 
-        // 6. Step
+        // 6. Check GPA
         if (!checkGPA(student, requiredGPA)) {
             process.GPAFlag = true;
 
             if (canGradeImprovementRaiseCGPA(student, requiredGPA)) {
                 process.gradeImprovementFlag = true;
                 process.examRight = ExamRight.EK_SINAV;
-                process.message += "GPA yükseltilebilir\n";
+                process.message += "GPA can be improved. Article 8.a\n";
                 return process;
             }
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "GPA düşük\n";
+            process.message += "Low GPA. Article 7.a\n";
             return process;
         } else {
             process.GPAFlag = false;
             process.examRight = ExamRight.HAK_YOK;
-            process.message += "GPA uygun\n";
+            process.message += "GPA satisfactory. You meet the graduation requirements! Article 7.b\n";
             return process;
         }
     }
+
+    // public EligibilityProcess checkEligibility(Student student) {
+    // process.message = "";
+    // String causeResult; // Variable to hold cause and result information
+
+    // // 1. Check the student's eligibility for the exam right
+    // checkMaxStudyDuration(student, maxStudyDuration);
+    // if (student.maxStudyDurationExceeded) {
+    // causeResult = "Azami Öğretim Süresini doldurdum: EVET. Madde 9’dan devam et.
+    // ÖNEMLİ: Sınav haklarından yararlanabilmek için dilekçe vermeniz gerekir.";
+    // process.message += "Article 1: " + causeResult + "\n";
+
+    // if (hasExcessiveTotalFailures(student, 6)) {
+    // process.tableCourseFlag = true;
+    // process.examRight = ExamRight.ILISIGI_KESILDI;
+    // process.message += "İlişiği kesildi: 5 taneden fazla FF veya FA notu. Article
+    // 9.a\n";
+    // return process;
+    // }
+
+    // long ffCount = countFFgrades(student);
+    // if (student.gotExamRight) {
+    // if (!student.gotExamRightAndUsed) {
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "Sınav hakkı yok: Dilekçe verilmedi veya kullanılmadı.
+    // Article 10.a\n";
+    // return process;
+    // } else if (process.gotExamRightAndUsed) {
+    // if (ffCount > maxFFCount) {
+    // process.examRight = ExamRight.ILISIGI_KESILDI;
+    // process.message += "İlişiği kesildi: 5'ten fazla FF notu. Article 11.b\n";
+    // return process;
+    // }
+    // }
+    // }
+
+    // if (ffCount > 5) {
+    // if (process.gotExamRightAndUsed) {
+    // process.examRight = ExamRight.ILISIGI_KESILDI;
+    // process.message += "İlişiği kesildi: 5'ten fazla FF notu. Article 9.a\n";
+    // return process;
+    // }
+    // process.examRight = ExamRight.EK_SINAV;
+    // process.message += "Ek sınav hakkı: 5'ten fazla FF notu. Article 12.c\n";
+    // process.FFgradeFlag = true;
+    // return process;
+    // } else if (ffCount > 1 && ffCount <= 5) {
+    // process.message += "Ek sınav hakkı: 1-5 arası FF notu. Article 12.c\n";
+    // process.FFgradeFlag = false;
+    // process.examRight = ExamRight.SINAV;
+    // return process;
+    // } else if (ffCount == 1) {
+    // process.FFgradeFlag = false;
+    // process.message += "Sınırsız sınav hakkı: 1 FF notu. Article 12.a\n";
+    // process.examRight = ExamRight.SINIRSIZ_SINAV;
+    // return process;
+    // }
+
+    // process.GPAFlag = checkGPA(student, requiredGPA);
+    // if (!process.GPAFlag) {
+    // canGradeImprovementRaiseCGPA(student, requiredGPA);
+    // process.examRight = ExamRight.SINIRSIZ_SINAV;
+    // process.message += "Sınırsız sınav hakkı: GPA düşük. Article 13.a\n";
+    // return process;
+    // } else if (!process.GPAFlag && !hasFailedTableCourseWithoutRetake(student)) {
+    // process.examRight = ExamRight.SINIRSIZ_SINAV;
+    // process.message += "Sınırsız sınav hakkı: GPA düşük ve failed table course
+    // without retake. Article 12.a\n";
+    // return process;
+    // }
+    // } else {
+    // process.message += "Article 1: Azami Öğretim Süresini doldurdum: HAYIR. Madde
+    // 2’den devam et.\n";
+    // }
+
+    // // 2. Check Withdrawals and Leaves
+    // if (!checkWithdrawalsAndLeaves(student)) {
+    // process.WorLflag = true;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "W veya L notu olan ders: Evet. Article 2.a\n";
+    // return process;
+    // } else {
+    // process.WorLflag = false;
+    // process.message += "W veya L notu olan ders: Hayır. Madde 3’den devam et.
+    // Article 2.b\n";
+    // }
+
+    // // 3. Check Internship
+    // if (!checkInternship(student)) {
+    // process.internshipFlag = true;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "Zorunlu staj tamamlanmadı. Article 3.b\n";
+    // return process;
+    // } else {
+    // process.internshipFlag = false;
+    // process.message += "Zorunlu staj tamamlandı. Madde 4’den devam et. Article
+    // 3.a\n";
+    // }
+
+    // // 4. Check All Courses Taken
+    // if (!student.isAllCoursesTaken) {
+    // process.allCoursesFlag = true;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "Tüm dersler alınmamış. Article 4.b\n";
+    // return process;
+    // } else {
+    // process.allCoursesFlag = false;
+    // process.message += "Tüm dersler alınmış. Madde 5’den devam et. Article
+    // 4.a\n";
+    // }
+
+    // if (student.semesterCount < 9) {
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "Normal öğretim süresi tamamlanmadı. Hak yok Article
+    // 5.b\n";
+    // return process;
+    // } else {
+    // process.message += "Normal öğretim süresi tamamlandı. Madde 6’dan devam et.
+    // Article 5.a\n";
+    // }
+
+    // // 5. Check FF Grades
+    // long FirstffCount = countFFgrades(student);
+    // if (FirstffCount == 1) {
+    // Boolean flag = hasFailedTableCourseWithoutRetake(student);
+    // if (flag) {
+    // process.tableCourseFlag = true;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "TABLO 1'de FF notu var. Article 6.a.i\n";
+    // return process;
+    // }
+    // process.FFgradeFlag = false;
+    // process.examRight = ExamRight.EK_SINAV;
+    // process.message += "Ek sınav hakkı: 1 FF notu. Article 6.a.ii\n";
+    // return process;
+    // } else if (FirstffCount > 1) {
+    // process.FFgradeFlag = true;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "Birden fazla FF notu. Article 6.b\n";
+    // return process;
+    // } else {
+    // process.FFgradeFlag = false;
+    // process.message += "FF notu yok. Madde 7’den devam et. Article 6.c\n";
+    // }
+
+    // // 6. Check GPA
+    // if (!checkGPA(student, requiredGPA)) {
+    // process.GPAFlag = true;
+
+    // if (canGradeImprovementRaiseCGPA(student, requiredGPA)) {
+    // process.gradeImprovementFlag = true;
+    // process.examRight = ExamRight.EK_SINAV;
+    // process.message += "GPA yükseltilebilir. Article 8.a\n";
+    // return process;
+    // }
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "GPA düşük. Article 7.a\n";
+    // return process;
+    // } else {
+    // process.GPAFlag = false;
+    // process.examRight = ExamRight.HAK_YOK;
+    // process.message += "GPA uygun. Mezuniyet için şartları sağlamaktasınız!
+    // Article 7.b\n";
+    // return process;
+    // }
+    // }
 
     public boolean checkWithdrawalsAndLeaves(Student student) {
         HashMap<String, List<String>> courseGrades = new HashMap<>();
@@ -238,22 +405,36 @@ public class EligibilityChecker {
 
     boolean checkInternship(Student student) {
         String internshipRegex = "([A-Z]{2,3} 400)";
-        // Regex to match "P", "P(R)", "P (R)", "P (R)", etc.
         String passedGradeRegex = "P\\s*\\(R\\)|P";
+        String bestGrade = null;
 
         for (Course course : student.courses) {
             if (course.code.matches(internshipRegex)) {
-                if (course.grade.matches(passedGradeRegex)) {
-                    process.message += "Student has passed the internship course: " + course.code + "  " + course.grade
-                            + "\n";
-                    return true;
-                } else {
-                    process.message += "Student has not passed the internship course: " + course.code + "\n";
-                    return false;
+
+                if (bestGrade == null || isBetterGrade(course.grade, bestGrade)) {
+                    bestGrade = course.grade;
                 }
             }
         }
-        process.message += "Student has not taken the internship course" + "\n";
+
+        if (bestGrade != null) {
+            if (bestGrade.matches(passedGradeRegex)) {
+                process.message += "Student has passed the internship course: " + bestGrade + "\n";
+                return true;
+            } else {
+                process.message += "Student has not passed the internship course: " + bestGrade + "\n";
+                return false;
+            }
+        }
+
+        process.message += "Student has not taken the internship course\n";
+        return false;
+    }
+
+    private boolean isBetterGrade(String newGrade, String currentBestGrade) {
+        if (newGrade.startsWith("P")) {
+            return true;
+        }
         return false;
     }
 
@@ -372,81 +553,168 @@ public class EligibilityChecker {
 
     public boolean checkFFgrades(Student student, int maxFFCount, int minFFCount) {
         Map<String, String> bestGrades = new HashMap<>();
-        Set<String> failingElectives = new HashSet<>();
-        Map<String, String> poolMap = new HashMap<>();
+        Set<String> finalFailedCourses = new HashSet<>();
+        Map<String, String> replacementMap = new HashMap<>(); // To track replacements
+        Map<String, String> originalFailedMap = new HashMap<>(); // To track original failed electives
 
-        // First pass to collect the best grades and identify failing electives
+        int creditDifference = student.totalCredits - student.completedCredits;
+        int predictedCreditDifference = 0;
+
+        if (creditDifference == 0) {
+            System.out.println("Student has completed all credits");
+        } else {
+            System.out.println("Student has not completed all credits");
+        }
+
+        // Iterate through the courses to determine the best attempts and replacements
         for (Course course : student.courses) {
+            boolean isElective = isElectiveCourse(course.code);
+            boolean isInternship = isInternshipCourse(course.code);
+            boolean isProject = isProjectCourse(course.code);
             boolean isFirstAttempt = student.courses.stream()
                     .filter(c -> c.code.equals(course.code))
                     .findFirst().get().equals(course);
 
-            if (isElectiveCourse(course.code) && !isInternshipCourse(course.code)) {
-                System.out.println("Elective course: " + course.code + " Grade: " + course.grade + " isFirstAttempt: "
-                        + isFirstAttempt);
+            if (isElective && !isInternship) {
+                if (!isPassingGrade(course.grade) && isFirstAttempt) {
+                    boolean isPassed = student.courses.stream()
+                            .filter(c -> c.code.equals(course.code))
+                            .anyMatch(c -> isPassingGrade(c.grade));
+                    if (!isPassed && !isProject) {
 
-                if (isFirstAttempt && course.grade.contains("(R)")) {
-                    // This course is a retake for a previously failed elective course
-                    poolMap.put(course.code, course.grade);
-                } else if (course.grade.startsWith("FF") || course.grade.startsWith("FA")) {
-                    failingElectives.add(course.code);
+                        originalFailedMap.put(course.code, course.grade);
+                    }
+
                 }
+
+                if (course.grade.contains("(R)") && isFirstAttempt) {
+                    System.out.println("Unique retake course: " + course.code);
+
+                    // This course is a retake for a previously failed elective course
+                    // and should be considered for replacement
+                    // remove one original failed course from the list
+                    if (originalFailedMap.size() > 0) {
+                        String originalCourseCode = originalFailedMap.keySet().iterator().next();
+                        replacementMap.put(course.code, originalCourseCode);
+                        originalFailedMap.remove(originalCourseCode);
+                    } else {
+                        replacementMap.put(course.code, course.grade);
+                    }
+                }
+
                 bestGrades.compute(course.code,
                         (key, currentBestGrade) -> currentBestGrade == null
                                 || isHigherGrade(course.grade, currentBestGrade)
                                         ? course.grade
                                         : currentBestGrade);
-            } else if (!isInternshipCourse(course.code)) {
+
+            } else {
                 bestGrades.compute(course.code,
                         (key, currentBestGrade) -> currentBestGrade == null
                                 || isHigherGrade(course.grade, currentBestGrade)
                                         ? course.grade
                                         : currentBestGrade);
             }
+
         }
 
-        // Collect keys to be removed
-        List<String> keysToRemove = new ArrayList<>();
-        for (Map.Entry<String, String> entry : poolMap.entrySet()) {
-            System.out.println("Checking replacement course: " + entry.getKey());
+        // Process additional exams to update the best grades
+        for (AdditionalExam exam : student.additionalExams) {
+            System.out.println("Additional exam for course: " + exam.code + " Grade: " + exam.grade);
+            if (isPassingGrade(exam.grade)) {
 
-            boolean hasPassingGrade = bestGrades.entrySet().stream()
-                    .anyMatch(e -> !e.getKey().equals(entry.getKey()) && !e.getValue().startsWith("FF")
-                            && !e.getValue().startsWith("FA") && poolMap.containsKey(e.getKey()));
-            if (!hasPassingGrade) {
-                keysToRemove.add(entry.getKey());
+                bestGrades.compute(exam.code,
+                        (key, currentBestGrade) -> currentBestGrade == null
+                                || isHigherGrade(exam.grade, currentBestGrade)
+                                        ? exam.grade
+                                        : currentBestGrade);
+
+                System.out.println("Passed additional exam for course: " + exam.code);
             }
         }
 
-        // Remove keys after iteration
-        for (String key : keysToRemove) {
-            poolMap.remove(key);
+        // print replacement map
+        for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
+
+            System.out.println("Replacement course: " + entry.getKey() + " Original: " + entry.getValue());
         }
 
-        // Calculate the final failing grades set
-        Set<String> finalFailedCourses = new HashSet<>(failingElectives);
-        for (String courseCode : failingElectives) {
-            if (poolMap.containsKey(courseCode) && isElectiveCourse(courseCode)) {
-                finalFailedCourses.remove(courseCode);
+        // Identify final failed courses
+        for (Map.Entry<String, String> entry : bestGrades.entrySet()) {
+            System.out.println("Course code: " + entry.getKey() + " Grade: " + entry.getValue());
+            if (!isPassingGrade(entry.getValue()) && !isNonContributingGrade(entry.getValue())) {
+                System.out.println("****Final failed course: " + entry.getKey());
+                finalFailedCourses.add(entry.getKey());
+            }
+        }
+
+        // Print replacement map
+        for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
+            System.out.println("Replacement course: " + entry.getKey() + " Original: " + entry.getValue());
+        }
+
+        // Ensure internship courses are included in the final failing courses
+        for (Course course : student.courses) {
+            // if student has not passed the internship course look for whole entries
+            boolean isInternship = isInternshipCourse(course.code);
+            boolean isPassed = student.courses.stream()
+                    .filter(c -> c.code.equals(course.code))
+                    .anyMatch(c -> isPassingGrade(c.grade));
+
+            if (isInternship && !isPassed) {
+                finalFailedCourses.add(course.code);
+            }
+
+        }
+
+        // remove replacement courses from the final failed courses
+        for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
+            System.out.println("Removing replacement course: " + entry.getKey() + " Original: " + entry.getValue());
+            finalFailedCourses.remove(entry.getValue());
+        }
+
+        // Calculate the predicted credit difference
+        for (String failedCourseCode : finalFailedCourses) {
+            if (!isInternshipCourse(failedCourseCode)) {
+                predictedCreditDifference += 3; // Assuming each elective course is 3 credits
+            }
+        }
+
+        System.out.println("Predicted credit difference: " + predictedCreditDifference);
+        System.out.println("Actual credit difference: " + creditDifference);
+
+        // Adjust the predicted credit difference based on actual credit difference
+        if (predictedCreditDifference != creditDifference) {
+            int adjustment = (int) Math.round((predictedCreditDifference - creditDifference) / 3.0);
+            System.out.println("Adjustment: " + adjustment);
+            if (adjustment == 0 && 0 > adjustment) {
+                adjustment = 1;
+            }
+            System.out.println("Adjustment: " + adjustment);
+            if (adjustment > 0) {
+                finalFailedCourses = adjustFailedCourses(finalFailedCourses, adjustment);
             }
         }
 
         // Log best grades
-        for (Map.Entry<String, String> entry : bestGrades.entrySet()) {
-            System.out.println("Course code: " + entry.getKey() + " Grade: " + entry.getValue());
-        }
+        // for (Map.Entry<String, String> entry : bestGrades.entrySet()) {
+        // System.out.println("Best Grade Course code: " + entry.getKey() + " Grade: " +
+        // entry.getValue());
+        // }
 
         // Log final failing grades count
-        System.out.println("Final failing grades count: " + (finalFailedCourses.size() - poolMap.size()));
+        System.out.println("Final failing grades count: " + finalFailedCourses.size());
 
         // Log failed courses
         for (String courseCode : finalFailedCourses) {
             System.out.println("Failed course code: " + courseCode);
         }
 
-        long failingGradesCount = finalFailedCourses.size() - poolMap.size();
+        process.message += "Student has " + finalFailedCourses.size() + " failing grades " + "\n";
 
-        System.out.println("FFFFFFFFFFFFFFF grades count: " + failingGradesCount);
+        process.failedGradesLog = finalFailedCourses;
+
+        int failingGradesCount = finalFailedCourses.size();
 
         process.message += "Student has " + failingGradesCount + " failing grades " + "\n";
 
